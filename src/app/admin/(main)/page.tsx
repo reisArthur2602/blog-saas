@@ -1,6 +1,5 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -14,7 +13,8 @@ import { useRouter } from 'next/navigation'
 
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { BlogSelectButton } from './_sessions/blog-select-button'
-import { Plus } from 'lucide-react'
+
+import { CreateBlogSheet } from './_sessions/create-blog-sheet'
 
 const Page = () => {
   const { user, blogs } = useAdmin()
@@ -31,9 +31,7 @@ const Page = () => {
         </CardHeader>
 
         <CardContent>
-          <Button className="w-full">
-            <Plus /> Criar Blog
-          </Button>
+          <CreateBlogSheet />
         </CardContent>
         <CardFooter>
           <ScrollArea>
