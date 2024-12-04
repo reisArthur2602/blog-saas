@@ -17,9 +17,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { signin } from '../actions'
+
+export type UserSignin = z.infer<typeof UserSignInSchema>
 
 export const FormSignin = () => {
-  const form = useForm<z.infer<typeof UserSignInSchema>>({
+  const form = useForm<UserSignin>({
     resolver: zodResolver(UserSignInSchema),
     defaultValues: {
       email: '',
@@ -27,7 +30,12 @@ export const FormSignin = () => {
     },
   })
 
-  const onSubmit = form.handleSubmit(async (data) => console.log(data))
+  const onSubmit = form.handleSubmit(
+    async (data) =>
+      await signin(data)
+        .then(() => console.log('Olá, bem vindo de volta!'))
+        .catch((error: Error) => console.error(error)),
+  )
 
   return (
     <Form {...form}>
