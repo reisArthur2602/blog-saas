@@ -3,7 +3,7 @@ import { FormSignUp } from './_sessions/form-signup'
 
 const Page = () => {
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-4 p-4 max-w-[25rem] w-full">
       <div>
         <h2 className="text-2xl font-semibold">Crie sua conta</h2>
         <p className="text-neutral-400">É GRÁTIS! Demora menos de um minuto.</p>
@@ -11,13 +11,13 @@ const Page = () => {
 
       <FormSignUp />
 
-      <div className="text-neutral-400">
-        Não tem uma conta?
+      <div className="text-neutral-400 text-sm text-center">
+        Já tem uma conta?
         <Link
           href={'/auth/signin'}
-          className="ml-2 text-primary font-bold border-primary hover:border-b "
+          className="ml-2 text-primary font-bold border-primary hover:border-b text-sm"
         >
-          Crie uma nova conta agora.
+          Faça login agora.
         </Link>
       </div>
     </div>
