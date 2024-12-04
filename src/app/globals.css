@@ -1,9 +1,18 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+body,
+html {
+  font-family: "Inter", serif;
+}
+
+
 :root {
   --gradient: linear-gradient(to top left, #091E3A, #2F80ED, #2D9EE0);
+
   --background: 228 98.65% 98.26%;
   --foreground: 228 7.3% 0.52%;
 
