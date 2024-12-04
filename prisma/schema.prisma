@@ -20,7 +20,7 @@ model User {
 
 model Blog {
   slug        String   @unique
-  title       String
+  name        String
   description String?
   mainColor   String?  @default("#FFFFFF")
   secondColor String?  @default("#000000")

@@ -31,7 +31,7 @@ const Page = () => {
         </CardHeader>
 
         <CardContent>
-          <CreateBlogSheet />
+          <CreateBlogSheet userId={user.id} />
         </CardContent>
         {blogs.length > 0 && (
           <CardFooter>

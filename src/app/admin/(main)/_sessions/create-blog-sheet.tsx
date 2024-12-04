@@ -26,9 +26,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Zap } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { createBlog } from '../actions'
 
-export const CreateBlogSheet = () => {
-  const form = useForm<z.infer<typeof CreateBlogSchema>>({
+export type CreateBlog = z.infer<typeof CreateBlogSchema>
+
+export const CreateBlogSheet = ({ userId }: { userId: string }) => {
+  const form = useForm<CreateBlog>({
     resolver: zodResolver(CreateBlogSchema),
     defaultValues: {
       slug: '',
@@ -39,7 +42,14 @@ export const CreateBlogSheet = () => {
     },
   })
 
-  const onSubmit = form.handleSubmit(async (data) => console.log(data))
+  const onSubmit = form.handleSubmit(
+    async (data) =>
+      await createBlog({ data, ownerId: userId })
+        .then(() => {
+          console.log('Blog cadastrado com  sucesso!')
+        })
+        .catch((error: Error) => console.log(error)),
+  )
 
   return (
     <Sheet>
