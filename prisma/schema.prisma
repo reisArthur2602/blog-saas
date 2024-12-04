@@ -19,16 +19,15 @@ model User {
 }
 
 model Blog {
-  id          String   @id @default(uuid())
   slug        String   @unique
-  name        String
-  subtitle    String
+  title       String
+  description String?
   mainColor   String?  @default("#FFFFFF")
   secondColor String?  @default("#000000")
+  User        User     @relation(fields: [owner_id], references: [id])
+  owner_id    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  User        User?    @relation(fields: [userId], references: [id])
-  userId      String?
 }
 
 enum UserRole {

@@ -10,6 +10,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+
 import {
   SheetTrigger,
   SheetContent,
@@ -19,6 +20,7 @@ import {
   SheetClose,
   Sheet,
 } from '@/components/ui/sheet'
+import { Textarea } from '@/components/ui/textarea'
 import { CreateBlogSchema } from '@/schemas/Blog'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Zap } from 'lucide-react'
@@ -29,10 +31,11 @@ export const CreateBlogSheet = () => {
   const form = useForm<z.infer<typeof CreateBlogSchema>>({
     resolver: zodResolver(CreateBlogSchema),
     defaultValues: {
+      slug: '',
+      description: '',
+      name: '',
       secondColor: '#000000',
       mainColor: '#FFFFFF',
-      slug: '',
-      subtitle: '',
     },
   })
 
@@ -46,7 +49,7 @@ export const CreateBlogSheet = () => {
         </Button>
       </SheetTrigger>
 
-      <SheetContent className="space-y-6">
+      <SheetContent className="space-y-6 overflow-y-auto w-full">
         <SheetHeader>
           <SheetTitle>Criar um novo Blog</SheetTitle>
           <Button variant={'link'}>
@@ -58,13 +61,13 @@ export const CreateBlogSheet = () => {
           <form className="space-y-4" onSubmit={onSubmit}>
             <FormField
               control={form.control}
-              name="subtitle"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Título</FormLabel>
+                  <FormLabel>Nome</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Digite um título"
+                      placeholder="Nome do blog"
                       disabled={form.formState.isSubmitting}
                       {...field}
                     />
@@ -73,6 +76,7 @@ export const CreateBlogSheet = () => {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="slug"
@@ -83,6 +87,24 @@ export const CreateBlogSheet = () => {
                     <Input
                       placeholder="ex: meu-blog"
                       disabled={form.formState.isSubmitting}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Descrição (opcional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Descrição"
+                      disabled={form.formState.isSubmitting}
+                      style={{ resize: 'none' }}
                       {...field}
                     />
                   </FormControl>
