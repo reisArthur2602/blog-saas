@@ -13,8 +13,22 @@ model User {
   name       String
   password   String
   role       UserRole @default(AUTHOR)
+  blogs      Blog[]
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
+}
+
+model Blog {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  name        String
+  subtitle    String
+  mainColor   String?  @default("#FFFFFF")
+  secondColor String?  @default("#000000")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  User        User?    @relation(fields: [userId], references: [id])
+  userId      String?
 }
 
 enum UserRole {
