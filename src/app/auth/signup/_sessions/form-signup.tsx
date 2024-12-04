@@ -17,9 +17,15 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { signup } from '../actions'
+import { useRouter } from 'next/navigation'
+
+export type UserSignup = z.infer<typeof UserSignUpSchema>
 
 export const FormSignUp = () => {
-  const form = useForm<z.infer<typeof UserSignUpSchema>>({
+  const { push } = useRouter()
+
+  const form = useForm<UserSignup>({
     resolver: zodResolver(UserSignUpSchema),
     defaultValues: {
       email: '',
@@ -28,7 +34,14 @@ export const FormSignUp = () => {
     },
   })
 
-  const onSubmit = form.handleSubmit(async (data) => console.log(data))
+  const onSubmit = form.handleSubmit(async (data) => {
+    await signup(data, 'OWNER')
+      .then(() => {
+        console.log('O usuário foi cadastrado com sucesso! Faça login')
+        push('/auth/signin')
+      })
+      .catch((error: Error) => console.error(error.message))
+  })
 
   return (
     <Form {...form}>
