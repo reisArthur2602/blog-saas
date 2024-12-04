@@ -33,16 +33,18 @@ const Page = () => {
         <CardContent>
           <CreateBlogSheet />
         </CardContent>
-        <CardFooter>
-          <ScrollArea>
-            <div className="flex items-center gap-4 p-4">
-              {blogs.map((blog) => (
-                <BlogSelectButton key={blog.slug} blog={blog} />
-              ))}
-            </div>
-            <ScrollBar orientation="horizontal" className="h-3" />
-          </ScrollArea>
-        </CardFooter>
+        {blogs.length > 0 && (
+          <CardFooter>
+            <ScrollArea>
+              <div className="flex items-center gap-4 p-4">
+                {blogs.map((blog) => (
+                  <BlogSelectButton key={blog.slug} blog={blog} />
+                ))}
+              </div>
+              <ScrollBar orientation="horizontal" className="h-3" />
+            </ScrollArea>
+          </CardFooter>
+        )}
       </Card>
     </main>
   )
