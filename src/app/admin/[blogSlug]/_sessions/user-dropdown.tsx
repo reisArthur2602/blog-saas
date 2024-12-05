@@ -19,29 +19,43 @@ import { onLogout } from '../actions'
 
 type UserDropdownProps = {
   slug: string
+  user: {
+    email: string
+    name: string
+  }
 }
 
-export const UserDropdown = ({ slug }: UserDropdownProps) => {
+const getAvatarInitials = (name: string): string => {
+  if (!name) return ''
+
+  const words = name.trim().split(/\s+/)
+  const firstNameInitial = words[0]?.[0]?.toUpperCase() || ''
+  const lastNameInitial = words[1]?.[0]?.toUpperCase() || ''
+
+  return firstNameInitial + lastNameInitial
+}
+
+export const UserDropdown = ({ slug, user }: UserDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="link"
-          className="relative h-8 flex items-center justify-between w-full space-x-1 !px-0"
+          className="flex items-center justify-start w-full space-x-1 !px-0 focus-visible:ring-0"
           style={{ textDecoration: 'none' }}
         >
           <Avatar className="h-10 w-10">
             <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-            <AvatarFallback>AR</AvatarFallback>
+            <AvatarFallback>{getAvatarInitials(user.name)}</AvatarFallback>
           </Avatar>
 
           <div className="flex flex-col space-y-1 text-left text-xs truncate">
-            <p className="truncate font-medium flex-1 leading-none">
-              Arthur Reis
+            <p className=" font-medium flex-1 leading-none capitalize truncate">
+              {user.name}
             </p>
 
-            <p className="truncate leading-none flex-1 text-muted-foreground">
-              contato.arthurreis222@gmail.com
+            <p className="leading-none flex-1 text-muted-foreground truncate">
+              {user.email}
             </p>
           </div>
         </Button>
@@ -49,9 +63,11 @@ export const UserDropdown = ({ slug }: UserDropdownProps) => {
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">Arthur Reis</p>
+            <p className="text-sm font-medium leading-none capitalize">
+              {user.name}
+            </p>
             <p className="text-xs leading-none text-muted-foreground">
-              contato.arthurreis222@gmail.com
+              {user.email}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -74,7 +90,7 @@ export const UserDropdown = ({ slug }: UserDropdownProps) => {
 
         <DropdownMenuItem className="cursor-pointer" onClick={() => onLogout()}>
           <LogOut />
-          <span>Log out</span>
+          <span>Sair</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

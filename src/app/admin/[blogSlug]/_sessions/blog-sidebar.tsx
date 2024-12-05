@@ -80,7 +80,10 @@ export const BlogSidebar = ({ blog }: BlogSidebarProps) => {
         </SidebarNav>
       </SidebarContent>
       <SidebarFooter>
-        <UserDropdown slug={blog.slug} />
+        <UserDropdown
+          slug={blog.slug}
+          user={{ email: user!.email, name: user!.name }}
+        />
       </SidebarFooter>
     </Sidebar>
   )
