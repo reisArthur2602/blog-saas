@@ -1,5 +1,14 @@
+import { Content, Header, HeaderTitle } from '@/components/ui/layout'
+
 const Page = () => {
-  return <div>Page</div>
+  return (
+    <div>
+      <Header>
+        <HeaderTitle>Usuários</HeaderTitle>
+      </Header>
+      <Content>...</Content>
+    </div>
+  )
 }
 
 export default Page

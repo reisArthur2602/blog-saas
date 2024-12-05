@@ -15,9 +15,9 @@ const BlogLayout = async ({
   if (!blog) redirect('/admin')
 
   return (
-    <div className="grid grid-cols-[18rem_1fr] gap-4 h-screen">
+    <div className="grid grid-cols-[20rem_1fr] h-screen">
       <BlogSidebar blog={blog} />
-      <main> {children}</main>
+      <main>{children}</main>
     </div>
   )
 }

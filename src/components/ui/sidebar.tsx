@@ -1,21 +1,26 @@
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
-export type SidebarGenericProps<T = unknown> = {
+export type ComponentGenericProps<T = unknown> = {
   children: React.ReactNode
   className?: string
 } & T
 
-export const Sidebar = ({ className, children }: SidebarGenericProps) => {
+export const Sidebar = ({ className, children }: ComponentGenericProps) => {
   return (
-    <aside className={cn(['border-r  flex flex-col font-medium', className])}>
+    <aside className={cn(['border-r flex flex-col font-medium', className])}>
       {children}
     </aside>
   )
 }
-export const SidebarHeader = ({ className, children }: SidebarGenericProps) => {
+export const SidebarHeader = ({
+  className,
+  children,
+}: ComponentGenericProps) => {
   return (
-    <header className={cn(['p-6 flex items-center border-b ', className])}>
+    <header
+      className={cn(['px-6 h-16 flex items-center border-b ', className])}
+    >
       {children}
     </header>
   )
@@ -24,10 +29,10 @@ export const SidebarHeader = ({ className, children }: SidebarGenericProps) => {
 export const SidebarContent = ({
   className,
   children,
-}: SidebarGenericProps) => {
+}: ComponentGenericProps) => {
   return <div className={cn(['p-4 flex-1 ', className])}>{children}</div>
 }
-export const SidebarNav = ({ className, children }: SidebarGenericProps) => {
+export const SidebarNav = ({ className, children }: ComponentGenericProps) => {
   return (
     <nav className={cn(['flex flex-col gap-2', className])}>{children}</nav>
   )
@@ -43,7 +48,7 @@ export const SidebarNavLink = ({
   children,
   href,
   active,
-}: SidebarGenericProps<SidebarNavLinkProps>) => {
+}: ComponentGenericProps<SidebarNavLinkProps>) => {
   return (
     <Link
       href={href}
@@ -58,7 +63,10 @@ export const SidebarNavLink = ({
   )
 }
 
-export const SidebarFooter = ({ className, children }: SidebarGenericProps) => {
+export const SidebarFooter = ({
+  className,
+  children,
+}: ComponentGenericProps) => {
   return (
     <footer className={cn(['p-6 border-t mt-auto', className])}>
       {children}

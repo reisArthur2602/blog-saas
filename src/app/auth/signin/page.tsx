@@ -6,14 +6,14 @@ const Page = () => {
     <div className="space-y-4 p-4 max-w-[25rem] w-full">
       <div>
         <h2 className="text-2xl font-semibold">Bem-vindo de volta!</h2>
-        <p className="text-neutral-400">
+        <p className="text-muted-foreground ">
           Preencha o formulário para acessar sua conta
         </p>
       </div>
 
       <FormSignin />
 
-      <div className="text-neutral-400 text-sm text-center">
+      <div className="text-muted-foreground text-sm text-center">
         Não tem uma conta?
         <Link
           href={'/auth/signup'}
