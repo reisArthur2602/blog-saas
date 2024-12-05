@@ -1,17 +1,25 @@
 'use client'
 
-import { Blog } from '@prisma/client'
-import { createContext, useContext } from 'react'
+import { Blog, UserRole } from '@prisma/client'
+import { createContext, useContext, useState } from 'react'
 
-type User = { id: string; role: string }
+export type SessionUser = {
+  id: string
+  role: UserRole
+  email: string
+  name: string
+}
 
 type AdminContextData = {
   blogs: Blog[] | []
-  user: User | null
+  user: SessionUser | null
+  selectedBlog: Blog | null
+  setSelectedBlog: (blog: Blog) => void
 }
+
 type AdminProviderProps = {
   children: React.ReactNode
-  initialUser: User | null
+  initialUser: SessionUser | null
   initialBlogs: Blog[] | []
 }
 
@@ -22,8 +30,16 @@ export const AdminProvider = ({
   initialBlogs,
   initialUser,
 }: AdminProviderProps) => {
+  const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null)
   return (
-    <AdminContext.Provider value={{ user: initialUser, blogs: initialBlogs }}>
+    <AdminContext.Provider
+      value={{
+        user: initialUser,
+        blogs: initialBlogs,
+        selectedBlog,
+        setSelectedBlog,
+      }}
+    >
       {children}
     </AdminContext.Provider>
   )

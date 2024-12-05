@@ -1,4 +1,4 @@
-import { CreditCard, LogOut, Settings } from 'lucide-react'
+import { CreditCard, LogOut } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -14,7 +14,7 @@ import {
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
-export const UserDropdown = () => {
+export const UserDropdown = ({ slug }: { slug: string }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -52,15 +52,11 @@ export const UserDropdown = () => {
         <DropdownMenuSeparator />
 
         <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer">
-            <Link href={'#'} className="flex items-center gap-2">
-              <Settings />
-              <span>Configurações</span>
-            </Link>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem className="cursor-pointer">
-            <Link href={'#'} className="flex items-center gap-2">
+          <DropdownMenuItem>
+            <Link
+              href={`/admin/${slug}/settings/subscription`}
+              className="flex items-center gap-2 cursor-pointer"
+            >
               <CreditCard />
               <span>Upgrade</span>
             </Link>
