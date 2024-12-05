@@ -1,3 +1,5 @@
+'use client'
+
 import { CreditCard, LogOut } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -13,8 +15,13 @@ import {
 
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { onLogout } from '../actions'
 
-export const UserDropdown = ({ slug }: { slug: string }) => {
+type UserDropdownProps = {
+  slug: string
+}
+
+export const UserDropdown = ({ slug }: UserDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -65,7 +72,7 @@ export const UserDropdown = ({ slug }: { slug: string }) => {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="cursor-pointer">
+        <DropdownMenuItem className="cursor-pointer" onClick={() => onLogout()}>
           <LogOut />
           <span>Log out</span>
         </DropdownMenuItem>
