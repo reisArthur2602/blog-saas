@@ -8,26 +8,35 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  email      String   @unique
+  id         String     @id @default(uuid())
+  email      String     @unique
   name       String
   password   String
-  role       UserRole @default(AUTHOR)
-  blogs      Blog[]
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  blogs      BlogUser[]
 }
 
 model Blog {
-  slug        String   @unique
+  slug        String     @unique
   name        String
   description String?
-  mainColor   String?  @default("#FFFFFF")
-  secondColor String?  @default("#000000")
-  User        User     @relation(fields: [owner_id], references: [id])
-  owner_id    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  mainColor   String?    @default("#FFFFFF")
+  secondColor String?    @default("#000000")
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  users       BlogUser[]
+}
+
+model BlogUser {
+  id         String   @id @default(uuid())
+  role       UserRole @default(AUTHOR)
+  blog       Blog     @relation(fields: [blog_slug], references: [slug])
+  blog_slug  String
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
 enum UserRole {
