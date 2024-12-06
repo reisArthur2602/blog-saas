@@ -1,10 +1,6 @@
 import { ComponentGenericProps } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 
-export const Content = ({ className, children }: ComponentGenericProps) => {
-  return <div className={cn(['p-6', className])}>{children}</div>
-}
-
 export const Header = ({ className, children }: ComponentGenericProps) => {
   return (
     <header
