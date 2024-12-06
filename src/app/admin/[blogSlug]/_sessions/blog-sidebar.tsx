@@ -40,19 +40,19 @@ export const BlogSidebar = ({ blog, user }: BlogSidebarProps) => {
       name: 'Publicações',
       href: baseUrlBlog + '/posts',
       icon: <Inbox size={16} />,
-      disabled: false,
+      hasPermission: true,
     },
     {
       name: 'Usuários',
       href: baseUrlBlog + '/users',
       icon: <Users size={16} />,
-      disabled: !hasPermission(user.role, ['OWNER']),
+      hasPermission: hasPermission(user.role, ['OWNER']),
     },
     {
       name: 'Configurações',
       href: baseUrlBlog + '/settings',
       icon: <Settings size={16} />,
-      disabled: !hasPermission(user.role, ['OWNER']),
+      hasPermission: hasPermission(user.role, ['OWNER']),
     },
   ]
 
@@ -65,7 +65,7 @@ export const BlogSidebar = ({ blog, user }: BlogSidebarProps) => {
         <SidebarNav>
           {menuLinks.map(
             (link) =>
-              !link.disabled && (
+              link.hasPermission && (
                 <SidebarNavLink
                   key={link.href}
                   href={link.href}

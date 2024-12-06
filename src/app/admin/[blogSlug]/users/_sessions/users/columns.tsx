@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { formatRole } from '@/lib/utils'
 import { UserRole } from '@prisma/client'
 
 import { ColumnDef } from '@tanstack/react-table'
@@ -16,17 +17,6 @@ export type UserColumn = {
     id: string
     email: string
     name: string
-  }
-}
-
-const formatRole = (role: UserRole) => {
-  switch (role) {
-    case 'OWNER':
-      return 'Criador'
-    case 'AUTHOR':
-      return 'Autor'
-    case 'EDITOR':
-      return 'Editor'
   }
 }
 

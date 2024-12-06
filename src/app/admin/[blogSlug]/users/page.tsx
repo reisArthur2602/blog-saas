@@ -1,6 +1,7 @@
 import { Header, HeaderTitle } from '@/components/ui/header'
 import { getUsersBlog } from './actions'
 import { UsersTable } from './_sessions/users/users-table'
+import { CreateUserButton } from './_sessions/create-user-button'
 
 type Props = {
   params: {
@@ -10,12 +11,12 @@ type Props = {
 
 const Page = async ({ params: { blogSlug } }: Props) => {
   const users = await getUsersBlog(blogSlug)
-  console.log(users)
 
   return (
     <div>
       <Header>
         <HeaderTitle>Usuários</HeaderTitle>
+        <CreateUserButton blogSlug={blogSlug} />
       </Header>
       <div className="space-y-6 p-6">
         <div>

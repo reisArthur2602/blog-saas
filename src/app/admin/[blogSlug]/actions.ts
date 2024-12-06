@@ -7,7 +7,7 @@ export const getBlogBySlug = async (slug: string) => {
   const user = await auth()
   const blog = await db.blog.findUnique({
     where: { slug, users: { some: { user_id: user?.id } } },
-    include: { users: true },
+    include: { users: { where: { user_id: user?.id } } },
   })
   return blog
 }
