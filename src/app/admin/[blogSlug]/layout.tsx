@@ -15,10 +15,18 @@ const BlogLayout = async ({
   const blog = await getBlogBySlug(blogSlug)
   if (!blog) redirect('/admin')
 
-  const { email, role, name } = await auth()
+  const user = await auth()
+
   return (
     <div className="grid grid-cols-[20rem_1fr] h-screen">
-      <BlogSidebar blog={blog} user={{ email, role, name }} />
+      <BlogSidebar
+        blog={blog}
+        user={{
+          email: user!.email,
+          role: blog.users[0].role,
+          name: user!.name,
+        }}
+      />
       <main>{children}</main>
     </div>
   )

@@ -5,7 +5,6 @@ import { UserSignin } from './_sessions/form-signin'
 import { db } from '@/lib/prisma'
 import { sign } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
-import { SessionUser } from '@/providers/admin'
 
 export const signin = async (data: UserSignin) => {
   const user = await db.user.findUnique({
@@ -17,15 +16,10 @@ export const signin = async (data: UserSignin) => {
   const isPasswordValid = await compare(data.password, user.password)
   if (!isPasswordValid) throw new Error('Email e/ou Senha incorreto(a)')
 
-  const session: SessionUser = {
-    email: user.email,
-    id: user.id,
-    name: user.name,
-    role: user.role,
-  }
+  const decoded = { id: user.id }
 
-  const token = sign(session, process.env.JWT_SECRET!, {
-    expiresIn: process.env.EXPIRES_IN,
+  const token = sign(decoded, process.env.JWT_SECRET!, {
+    expiresIn: process.env.EXPIRES_IN!,
   })
 
   cookies().set('token', token, {

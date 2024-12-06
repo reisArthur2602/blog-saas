@@ -5,14 +5,21 @@ import { revalidatePath } from 'next/cache'
 import { CreateBlog } from './_sessions/create-blog-sheet'
 import { auth } from '@/lib/auth'
 
-export const getBlogs = async () => {
-  const { id } = await auth()
-  const blogs = await db.blog.findMany({ where: { owner_id: id } })
-  return blogs
+export const getBlogsUser = async () => {
+  const user = await auth()
+
+  const blogsUser = await db.blogUser.findMany({
+    where: { user_id: user?.id },
+    include: {
+      blog: true,
+    },
+  })
+
+  return blogsUser
 }
 
 export const createBlog = async (data: CreateBlog) => {
-  const { id } = await auth()
+  const user = await auth()
 
   const hasBlogwithSlug = await db.blog.findUnique({
     where: { slug: data.slug },
@@ -23,7 +30,9 @@ export const createBlog = async (data: CreateBlog) => {
   await db.blog.create({
     data: {
       ...data,
-      User: { connect: { id } },
+      users: {
+        create: [{ role: 'OWNER', user_id: user!.id }],
+      },
     },
   })
 

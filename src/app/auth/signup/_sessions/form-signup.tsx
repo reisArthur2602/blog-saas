@@ -35,7 +35,7 @@ export const FormSignUp = () => {
   })
 
   const onSubmit = form.handleSubmit(async (data) => {
-    await signup(data, 'OWNER')
+    await signup(data)
       .then(() => {
         console.log('O usuário foi cadastrado com sucesso! Faça login')
         push('/auth/signin')

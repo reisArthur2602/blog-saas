@@ -2,7 +2,6 @@
 
 import { verify } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { db } from './prisma'
 import { revalidatePath } from 'next/cache'
 
@@ -12,10 +11,11 @@ type Payload = {
 
 export const auth = async () => {
   const token = cookies().get('token')?.value
-  if (!token) redirect('/auth/signin')
+  if (!token) return null
 
   try {
     const { id } = verify(token, process.env.JWT_SECRET!) as Payload
+
     const session = await db.user.findUnique({
       where: {
         id,
@@ -24,13 +24,12 @@ export const auth = async () => {
         id: true,
         email: true,
         name: true,
-        role: true,
       },
     })
 
-    return session!
+    return session
   } catch {
-    redirect('/auth/signin')
+    return null
   }
 }
 

@@ -11,10 +11,10 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { BlogSelectButton } from './_sessions/blog-select-button'
 
 import { CreateBlogSheet } from './_sessions/create-blog-sheet'
-import { getBlogs } from './actions'
+import { getBlogsUser } from './actions'
 
 const Page = async () => {
-  const blogs = await getBlogs()
+  const blogsUser = await getBlogsUser()
 
   return (
     <main className="h-screen flex items-center justify-center">
@@ -27,12 +27,16 @@ const Page = async () => {
         <CardContent>
           <CreateBlogSheet />
         </CardContent>
-        {blogs.length > 0 && (
+
+        {blogsUser.length > 0 && (
           <CardFooter>
             <ScrollArea>
               <div className="flex items-center gap-4 p-4">
-                {blogs.map((blog) => (
-                  <BlogSelectButton key={blog.slug} blog={blog} />
+                {blogsUser.map((blogUser) => (
+                  <BlogSelectButton
+                    key={blogUser.blog_slug}
+                    blog={blogUser.blog}
+                  />
                 ))}
               </div>
               <ScrollBar orientation="horizontal" className="h-3" />
