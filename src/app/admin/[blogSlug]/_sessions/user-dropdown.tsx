@@ -15,7 +15,7 @@ import {
 
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { onLogout } from '../actions'
+import { logout } from '@/lib/auth'
 
 type UserDropdownProps = {
   slug: string
@@ -88,7 +88,7 @@ export const UserDropdown = ({ slug, user }: UserDropdownProps) => {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="cursor-pointer" onClick={() => onLogout()}>
+        <DropdownMenuItem className="cursor-pointer" onClick={() => logout()}>
           <LogOut />
           <span>Sair</span>
         </DropdownMenuItem>

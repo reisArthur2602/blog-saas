@@ -30,7 +30,7 @@ import { createBlog } from '../actions'
 
 export type CreateBlog = z.infer<typeof CreateBlogSchema>
 
-export const CreateBlogSheet = ({ userId }: { userId: string }) => {
+export const CreateBlogSheet = () => {
   const form = useForm<CreateBlog>({
     resolver: zodResolver(CreateBlogSchema),
     defaultValues: {
@@ -44,9 +44,9 @@ export const CreateBlogSheet = ({ userId }: { userId: string }) => {
 
   const onSubmit = form.handleSubmit(
     async (data) =>
-      await createBlog({ data, ownerId: userId })
+      await createBlog(data)
         .then(() => {
-          console.log('Blog cadastrado com  sucesso!')
+          console.log('Blog cadastrado com sucesso!')
         })
         .catch((error: Error) => console.log(error)),
   )

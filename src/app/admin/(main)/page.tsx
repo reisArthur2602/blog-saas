@@ -1,5 +1,3 @@
-'use client'
-
 import {
   Card,
   CardContent,
@@ -8,19 +6,15 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { useAdmin } from '@/providers/admin'
-import { useRouter } from 'next/navigation'
 
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { BlogSelectButton } from './_sessions/blog-select-button'
 
 import { CreateBlogSheet } from './_sessions/create-blog-sheet'
+import { getBlogs } from './actions'
 
-const Page = () => {
-  const { user, blogs } = useAdmin()
-  const { push } = useRouter()
-
-  if (user?.role !== 'OWNER') return push('/admin/unauthorized')
+const Page = async () => {
+  const blogs = await getBlogs()
 
   return (
     <main className="h-screen flex items-center justify-center">
@@ -31,7 +25,7 @@ const Page = () => {
         </CardHeader>
 
         <CardContent>
-          <CreateBlogSheet userId={user.id} />
+          <CreateBlogSheet />
         </CardContent>
         {blogs.length > 0 && (
           <CardFooter>

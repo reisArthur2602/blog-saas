@@ -1,5 +1,4 @@
 'use client'
-
 import { Logo } from '@/components/ui/logo'
 import {
   Sidebar,
@@ -12,19 +11,22 @@ import {
 import { Home, Inbox, Settings, Users } from 'lucide-react'
 import { UserDropdown } from './user-dropdown'
 import { usePathname } from 'next/navigation'
-import { useAdmin } from '@/providers/admin'
-import { Blog } from '@prisma/client'
-import { useEffect } from 'react'
+
+import { Blog, UserRole } from '@prisma/client'
+import { hasPermission } from '@/lib/permissions'
 
 type BlogSidebarProps = {
   blog: Blog
+  user: {
+    email: string
+    name: string
+    role: UserRole
+  }
 }
 
-export const BlogSidebar = ({ blog }: BlogSidebarProps) => {
-  const { user, setSelectedBlog } = useAdmin()
-
-  const baseUrlBlog = `/admin/${blog.slug}`
+export const BlogSidebar = ({ blog, user }: BlogSidebarProps) => {
   const pathname = usePathname()
+  const baseUrlBlog = `/admin/${blog.slug}`
   const isActive = (path: string) => pathname === path
 
   const menuLinks = [
@@ -38,25 +40,21 @@ export const BlogSidebar = ({ blog }: BlogSidebarProps) => {
       name: 'Publicações',
       href: baseUrlBlog + '/posts',
       icon: <Inbox size={16} />,
-      hasPermission: true,
+      disabled: false,
     },
     {
       name: 'Usuários',
       href: baseUrlBlog + '/users',
       icon: <Users size={16} />,
-      hasPermission: user?.role === 'OWNER',
+      disabled: !hasPermission(user.role, ['OWNER']),
     },
     {
       name: 'Configurações',
       href: baseUrlBlog + '/settings',
       icon: <Settings size={16} />,
-      hasPermission: user?.role === 'OWNER',
+      disabled: !hasPermission(user.role, ['OWNER']),
     },
   ]
-
-  useEffect(() => {
-    setSelectedBlog(blog)
-  }, [setSelectedBlog, blog])
 
   return (
     <Sidebar>
@@ -67,7 +65,7 @@ export const BlogSidebar = ({ blog }: BlogSidebarProps) => {
         <SidebarNav>
           {menuLinks.map(
             (link) =>
-              link.hasPermission && (
+              !link.disabled && (
                 <SidebarNavLink
                   key={link.href}
                   href={link.href}
@@ -82,7 +80,7 @@ export const BlogSidebar = ({ blog }: BlogSidebarProps) => {
       <SidebarFooter>
         <UserDropdown
           slug={blog.slug}
-          user={{ email: user!.email, name: user!.name }}
+          user={{ email: user.email, name: user.name }}
         />
       </SidebarFooter>
     </Sidebar>
