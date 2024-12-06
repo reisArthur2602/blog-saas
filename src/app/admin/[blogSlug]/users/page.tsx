@@ -1,6 +1,17 @@
 import { Header, HeaderTitle } from '@/components/ui/header'
+import { getUsersBlog } from './actions'
+import { UsersTable } from './_sessions/users/users-table'
 
-const Page = () => {
+type Props = {
+  params: {
+    blogSlug: string
+  }
+}
+
+const Page = async ({ params: { blogSlug } }: Props) => {
+  const users = await getUsersBlog(blogSlug)
+  console.log(users)
+
   return (
     <div>
       <Header>
@@ -13,7 +24,7 @@ const Page = () => {
             Gerencie os usuário e suas permissões no blog
           </p>
         </div>
-        <div>...</div>
+        <UsersTable data={users} />
       </div>
     </div>
   )
