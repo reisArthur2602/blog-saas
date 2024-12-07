@@ -19,19 +19,24 @@ import {
   SheetFooter,
   SheetClose,
   Sheet,
+  SheetDescription,
 } from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
-import { CreateBlogSchema } from '@/schemas/Blog'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Zap } from 'lucide-react'
+
+import { Plus } from 'lucide-react'
+
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { BlogInput, CreateBlogSchema } from '@/schemas/Blog'
+
 import { createBlog } from '../actions'
+import { useState } from 'react'
 
-export type CreateBlog = z.infer<typeof CreateBlogSchema>
+export const CreateBlog = () => {
+  const [isOpen, setOpen] = useState(false)
 
-export const CreateBlogSheet = () => {
-  const form = useForm<CreateBlog>({
+  const form = useForm<BlogInput>({
     resolver: zodResolver(CreateBlogSchema),
     defaultValues: {
       slug: '',
@@ -42,17 +47,22 @@ export const CreateBlogSheet = () => {
     },
   })
 
-  const onSubmit = form.handleSubmit(
-    async (data) =>
-      await createBlog(data)
-        .then(() => {
-          console.log('Blog cadastrado com sucesso!')
-        })
-        .catch((error: Error) => console.log(error)),
-  )
+  const onSubmit = form.handleSubmit(async (data) => {
+    const response = await createBlog(data)
+    if (response?.error) return console.error(response.error)
+    console.log('Blog cadastrado com sucesso')
+    form.reset()
+    setOpen(!isOpen)
+  })
 
   return (
-    <Sheet>
+    <Sheet
+      open={isOpen}
+      onOpenChange={(open) => {
+        setOpen(open)
+        if (!open) form.reset()
+      }}
+    >
       <SheetTrigger asChild>
         <Button className="w-full">
           <Plus /> Criar Blog
@@ -62,9 +72,9 @@ export const CreateBlogSheet = () => {
       <SheetContent className="space-y-6 overflow-y-auto w-full">
         <SheetHeader>
           <SheetTitle>Criar um novo Blog</SheetTitle>
-          <Button variant={'link'}>
-            <Zap /> Gerar com IA
-          </Button>
+          <SheetDescription>
+            Preencha o formulário para criar um blog
+          </SheetDescription>
         </SheetHeader>
 
         <Form {...form}>
@@ -77,7 +87,7 @@ export const CreateBlogSheet = () => {
                   <FormLabel>Nome</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Nome do blog"
+                      placeholder="Nome"
                       disabled={form.formState.isSubmitting}
                       {...field}
                     />
@@ -157,7 +167,7 @@ export const CreateBlogSheet = () => {
               )}
             />
             <SheetFooter className="grid gap-3 sm:grid-cols-2 sm:gap-0">
-              <Button>Criar</Button>
+              <Button>Salvar</Button>
 
               <SheetClose className="w-full" asChild>
                 <Button variant="outline" className="w-full">

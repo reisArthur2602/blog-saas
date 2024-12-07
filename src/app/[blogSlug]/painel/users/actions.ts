@@ -4,13 +4,19 @@ import { db } from '@/lib/prisma'
 import { UserRole } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 
-export const getUsersBlog = async (slug: string) => {
-  const users = await db.blogUser.findMany({
+export const getBlogsUsersCurrentBlog = async (slug: string) => {
+  const blogsUsers = await db.blogUser.findMany({
     where: { blog_slug: slug },
-    include: { user: { select: { id: true, email: true, name: true } } },
+    select: {
+      id: true,
+      role: true,
+      blog_slug: true,
+      created_at: true,
+      user: { select: { id: true, email: true, name: true } },
+    },
   })
 
-  return users
+  return blogsUsers
 }
 
 export const createBlogUser = async ({
@@ -23,7 +29,8 @@ export const createBlogUser = async ({
   role: UserRole
 }) => {
   const user = await db.user.findUnique({ where: { email } })
-  if (!user) throw new Error('O usuário não foi encontrado')
+
+  if (!user) return { error: 'O usuário não foi encontrado' }
 
   await db.blogUser.create({
     data: {

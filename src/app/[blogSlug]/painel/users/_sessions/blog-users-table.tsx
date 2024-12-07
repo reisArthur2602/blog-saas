@@ -1,18 +1,19 @@
+'use client'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { formatRole } from '@/lib/utils'
+import { DataTable } from '@/components/ui/data-table'
+import { formatDate, formatRole } from '@/lib/utils'
 import { UserRole } from '@prisma/client'
 
 import { ColumnDef } from '@tanstack/react-table'
 import { Pen, Trash2Icon } from 'lucide-react'
 
-export type UserColumn = {
+type UserColumn = {
   id: string
   role: UserRole
   blog_slug: string
-  user_id: string
   created_at: Date
-  updated_at: Date
   user: {
     id: string
     email: string
@@ -35,34 +36,24 @@ export const columns: ColumnDef<UserColumn>[] = [
   {
     accessorKey: 'role',
     header: 'Permissão',
-    cell: ({ row }) => <Badge>{formatRole(row.original.role)}</Badge>,
+    cell: ({ row }) => (
+      <Badge variant="outline">{formatRole(row.original.role)}</Badge>
+    ),
   },
   {
     accessorKey: 'created_at',
     header: 'Data',
-    cell: ({ row }) => (
-      <span>
-        {new Intl.DateTimeFormat('pt-BR').format(row.original.created_at)}
-      </span>
-    ),
+    cell: ({ row }) => <span>{formatDate(row.original.created_at)}</span>,
   },
   {
     id: 'actions',
     header: 'Ações',
-    cell: ({ row }) => (
+    cell: () => (
       <div className="flex gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => handleEdit(row.original)}
-        >
+        <Button variant="ghost" size="icon">
           <Pen />
         </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => handleDelete(row.original)}
-        >
+        <Button variant="ghost" size="icon">
           <Trash2Icon />
         </Button>
       </div>
@@ -70,10 +61,6 @@ export const columns: ColumnDef<UserColumn>[] = [
   },
 ]
 
-const handleEdit = (user: UserColumn) => {
-  console.log('Edit user:', user)
-}
-
-const handleDelete = (user: UserColumn) => {
-  console.log('Delete user:', user)
+export const BlogUsersTable = ({ data }: { data: UserColumn[] }) => {
+  return <DataTable columns={columns} data={data} />
 }

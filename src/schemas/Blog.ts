@@ -13,3 +13,5 @@ export const CreateBlogSchema = z.object({
   mainColor: z.string(),
   secondColor: z.string(),
 })
+
+export type BlogInput = z.infer<typeof CreateBlogSchema>

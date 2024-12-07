@@ -1,20 +1,22 @@
 'use server'
 
 import { compare } from 'bcrypt'
-import { UserSignin } from './_sessions/form-signin'
+
 import { db } from '@/lib/prisma'
 import { sign } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { UserSigninInput } from '@/schemas/User'
 
-export const signin = async (data: UserSignin) => {
+export const signin = async (data: UserSigninInput) => {
   const user = await db.user.findUnique({
     where: { email: data.email },
   })
 
-  if (!user) throw new Error('Email e/ou Senha incorreto(a)')
+  if (!user) return { error: 'Acesso negado' }
 
   const isPasswordValid = await compare(data.password, user.password)
-  if (!isPasswordValid) throw new Error('Email e/ou Senha incorreto(a)')
+  if (!isPasswordValid) return { error: 'Acesso negado' }
 
   const decoded = { id: user.id }
 
@@ -28,4 +30,6 @@ export const signin = async (data: UserSignin) => {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
   })
+
+  redirect('/admin')
 }

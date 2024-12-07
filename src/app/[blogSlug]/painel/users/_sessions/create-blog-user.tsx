@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import { Button } from '@/components/ui/button'
 import {
   SheetTrigger,
@@ -21,9 +23,6 @@ import {
   Form,
 } from '@/components/ui/form'
 
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -32,29 +31,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+
 import { UserRole } from '@prisma/client'
-import { formatRole } from '@/lib/utils'
 import { createBlogUser } from '../actions'
-
-const CreateBlogUserSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .min(1, { message: 'O email é obrigatório' })
-    .email('Formato inválido'),
-  role: z.nativeEnum(UserRole),
-})
-
-type CreateBlogUser = z.infer<typeof CreateBlogUserSchema>
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { formatRole } from '@/lib/utils'
+import { BlogUserInput, CreateBlogUserSchema } from '@/schemas/BlogUser'
 
 const USER_ROLES: { role: UserRole }[] = [
-  { role: 'OWNER' },
-  { role: 'EDITOR' },
   { role: 'AUTHOR' },
+  { role: 'EDITOR' },
+  { role: 'OWNER' },
 ]
 
-export const CreateUserButton = ({ blogSlug }: { blogSlug: string }) => {
-  const form = useForm<CreateBlogUser>({
+export const CreateBlogUser = ({ slug }: { slug: string }) => {
+  const [isOpen, setOpen] = useState(false)
+
+  const form = useForm<BlogUserInput>({
     resolver: zodResolver(CreateBlogUserSchema),
     defaultValues: {
       email: '',
@@ -62,17 +56,24 @@ export const CreateUserButton = ({ blogSlug }: { blogSlug: string }) => {
     },
   })
 
-  const onSubmit = form.handleSubmit(
-    async (data) =>
-      await createBlogUser({ ...data, blogSlug })
-        .then(() => {
-          console.log('Usuário cadastrado com sucesso!')
-        })
-        .catch((error: Error) => console.log(error)),
-  )
+  const onSubmit = form.handleSubmit(async (data) => {
+    const response = await createBlogUser({ ...data, blogSlug: slug })
+
+    if (response?.error) return console.error(response.error)
+
+    console.log('Usuário adicionado com sucesso!')
+    form.reset()
+    setOpen(!open)
+  })
 
   return (
-    <Sheet>
+    <Sheet
+      open={isOpen}
+      onOpenChange={(open) => {
+        setOpen(open)
+        if (!open) form.reset()
+      }}
+    >
       <SheetTrigger asChild>
         <Button className="w-fit" size={'sm'}>
           Novo usuário
@@ -137,7 +138,7 @@ export const CreateUserButton = ({ blogSlug }: { blogSlug: string }) => {
             />
 
             <SheetFooter className="grid gap-3 sm:grid-cols-2 sm:gap-0">
-              <Button>Adicionar</Button>
+              <Button>Salvar</Button>
 
               <SheetClose className="w-full" asChild>
                 <Button variant="outline" className="w-full">

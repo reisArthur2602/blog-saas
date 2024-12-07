@@ -11,21 +11,16 @@ import {
 } from '@/components/ui/form'
 
 import { Input } from '@/components/ui/input'
-import { UserSignInSchema } from '@/schemas/User'
+import { UserSigninInput, UserSignInSchema } from '@/schemas/User'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { signin } from '../actions'
-import { useRouter } from 'next/navigation'
 
-export type UserSignin = z.infer<typeof UserSignInSchema>
+import { signin } from '../actions'
 
 export const FormSignin = () => {
-  const { push } = useRouter()
-
-  const form = useForm<UserSignin>({
+  const form = useForm<UserSigninInput>({
     resolver: zodResolver(UserSignInSchema),
     defaultValues: {
       email: '',
@@ -33,15 +28,10 @@ export const FormSignin = () => {
     },
   })
 
-  const onSubmit = form.handleSubmit(
-    async (data) =>
-      await signin(data)
-        .then(() => {
-          console.log('Olá, bem vindo de volta!')
-          push('/admin')
-        })
-        .catch((error: Error) => console.error(error)),
-  )
+  const onSubmit = form.handleSubmit(async (data) => {
+    const response = await signin(data)
+    if (response?.error) return console.error(response.error)
+  })
 
   return (
     <Form {...form}>

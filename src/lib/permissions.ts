@@ -1,5 +1,8 @@
 import { UserRole } from '@prisma/client'
 
-export const hasPermission = (UserRole: UserRole, roles: UserRole[]) => {
-  return roles.includes(UserRole)
+export const hasPermission = (
+  userRole: 'OWNER' | 'EDITOR' | 'AUTHOR',
+  roles: UserRole[],
+) => {
+  return roles.includes(userRole)
 }

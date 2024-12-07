@@ -16,12 +16,14 @@ import {
 import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { logout } from '@/lib/auth'
+import { UserRole } from '@prisma/client'
 
 type UserDropdownProps = {
-  slug: string
-  user: {
+  data: {
+    slug: string
     email: string
     name: string
+    role: UserRole
   }
 }
 
@@ -35,7 +37,7 @@ const getAvatarInitials = (name: string): string => {
   return firstNameInitial + lastNameInitial
 }
 
-export const UserDropdown = ({ slug, user }: UserDropdownProps) => {
+export const UserDropdown = ({ data }: UserDropdownProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -46,16 +48,16 @@ export const UserDropdown = ({ slug, user }: UserDropdownProps) => {
         >
           <Avatar className="h-10 w-10">
             <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-            <AvatarFallback>{getAvatarInitials(user.name)}</AvatarFallback>
+            <AvatarFallback>{getAvatarInitials(data.name)}</AvatarFallback>
           </Avatar>
 
           <div className="flex flex-col space-y-1 text-left text-xs truncate">
             <p className=" font-medium flex-1 leading-none capitalize truncate">
-              {user.name}
+              {data.name}
             </p>
 
             <p className="leading-none flex-1 text-muted-foreground truncate">
-              {user.email}
+              {data.email}
             </p>
           </div>
         </Button>
@@ -64,10 +66,10 @@ export const UserDropdown = ({ slug, user }: UserDropdownProps) => {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none capitalize">
-              {user.name}
+              {data.name}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {user.email}
+              {data.email}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -77,7 +79,7 @@ export const UserDropdown = ({ slug, user }: UserDropdownProps) => {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <Link
-              href={`/admin/${slug}/settings/subscription`}
+              href={`/${data.slug}/painel/settings/subscription`}
               className="flex items-center gap-2 cursor-pointer"
             >
               <CreditCard />

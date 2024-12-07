@@ -1,4 +1,5 @@
 'use client'
+
 import { Logo } from '@/components/ui/logo'
 import {
   Sidebar,
@@ -12,22 +13,32 @@ import { Home, Inbox, Settings, Users } from 'lucide-react'
 import { UserDropdown } from './user-dropdown'
 import { usePathname } from 'next/navigation'
 
-import { Blog, UserRole } from '@prisma/client'
 import { hasPermission } from '@/lib/permissions'
+import { UserRole } from '@prisma/client'
 
 type BlogSidebarProps = {
-  blog: Blog
-  user: {
-    email: string
-    name: string
-    role: UserRole
+  data: {
+    blog: {
+      slug: string
+      blogUser: {
+        id: string
+        role: UserRole
+        user: {
+          id: string
+          email: string
+          name: string
+        }
+      }
+    }
   }
 }
 
-export const BlogSidebar = ({ blog, user }: BlogSidebarProps) => {
+export const BlogSidebar = ({ data }: BlogSidebarProps) => {
   const pathname = usePathname()
-  const baseUrlBlog = `/admin/${blog.slug}`
-  const isActive = (path: string) => pathname === path
+
+  const baseUrlBlog = `/${data.blog.slug}/painel`
+
+  const isCurrentPath = (path: string) => pathname === path
 
   const menuLinks = [
     {
@@ -46,13 +57,13 @@ export const BlogSidebar = ({ blog, user }: BlogSidebarProps) => {
       name: 'Usuários',
       href: baseUrlBlog + '/users',
       icon: <Users size={16} />,
-      hasPermission: hasPermission(user.role, ['OWNER']),
+      hasPermission: hasPermission(data.blog.blogUser.role, ['OWNER']),
     },
     {
       name: 'Configurações',
       href: baseUrlBlog + '/settings',
       icon: <Settings size={16} />,
-      hasPermission: hasPermission(user.role, ['OWNER']),
+      hasPermission: hasPermission(data.blog.blogUser.role, ['OWNER']),
     },
   ]
 
@@ -69,7 +80,7 @@ export const BlogSidebar = ({ blog, user }: BlogSidebarProps) => {
                 <SidebarNavLink
                   key={link.href}
                   href={link.href}
-                  active={isActive(link.href)}
+                  active={isCurrentPath(link.href)}
                 >
                   {link.icon} {link.name}
                 </SidebarNavLink>
@@ -79,8 +90,12 @@ export const BlogSidebar = ({ blog, user }: BlogSidebarProps) => {
       </SidebarContent>
       <SidebarFooter>
         <UserDropdown
-          slug={blog.slug}
-          user={{ email: user.email, name: user.name }}
+          data={{
+            slug: data.blog.slug,
+            email: data.blog.blogUser.user.email,
+            name: data.blog.blogUser.user.name,
+            role: data.blog.blogUser.role,
+          }}
         />
       </SidebarFooter>
     </Sidebar>

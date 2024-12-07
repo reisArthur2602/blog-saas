@@ -3,7 +3,7 @@
 import { verify } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
 import { db } from './prisma'
-import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
 type Payload = {
   id: string
@@ -35,5 +35,5 @@ export const auth = async () => {
 
 export const logout = () => {
   cookies().delete('token')
-  revalidatePath('/admin')
+  redirect('/auth/signin')
 }

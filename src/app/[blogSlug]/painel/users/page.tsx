@@ -1,7 +1,8 @@
 import { Header, HeaderTitle } from '@/components/ui/header'
-import { getUsersBlog } from './actions'
-import { UsersTable } from './_sessions/users/users-table'
-import { CreateUserButton } from './_sessions/create-user-button'
+import { getBlogsUsersCurrentBlog } from './actions'
+
+import { CreateBlogUser } from './_sessions/create-blog-user'
+import { BlogUsersTable } from './_sessions/blog-users-table'
 
 type Props = {
   params: {
@@ -10,13 +11,13 @@ type Props = {
 }
 
 const Page = async ({ params: { blogSlug } }: Props) => {
-  const users = await getUsersBlog(blogSlug)
+  const blogsUsersCurrentBlog = await getBlogsUsersCurrentBlog(blogSlug)
 
   return (
     <div>
       <Header>
         <HeaderTitle>Usuários</HeaderTitle>
-        <CreateUserButton blogSlug={blogSlug} />
+        <CreateBlogUser slug={blogSlug} />
       </Header>
       <div className="space-y-6 p-6">
         <div>
@@ -25,7 +26,7 @@ const Page = async ({ params: { blogSlug } }: Props) => {
             Gerencie os usuário e suas permissões no blog
           </p>
         </div>
-        <UsersTable data={users} />
+        <BlogUsersTable data={blogsUsersCurrentBlog} />
       </div>
     </div>
   )
