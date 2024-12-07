@@ -7,7 +7,8 @@ import { formatDate, formatRole } from '@/lib/utils'
 import { UserRole } from '@prisma/client'
 
 import { ColumnDef } from '@tanstack/react-table'
-import { Pen, Trash2Icon } from 'lucide-react'
+import { Trash2Icon } from 'lucide-react'
+import { EditBlogUser } from './edit-blog-user'
 
 type UserColumn = {
   id: string
@@ -35,7 +36,7 @@ export const columns: ColumnDef<UserColumn>[] = [
 
   {
     accessorKey: 'role',
-    header: 'Permissão',
+    header: 'Cargo',
     cell: ({ row }) => (
       <Badge variant="outline">{formatRole(row.original.role)}</Badge>
     ),
@@ -48,11 +49,17 @@ export const columns: ColumnDef<UserColumn>[] = [
   {
     id: 'actions',
     header: 'Ações',
-    cell: () => (
+    cell: ({
+      row: {
+        original: {
+          id,
+          role,
+          user: { email },
+        },
+      },
+    }) => (
       <div className="flex gap-2">
-        <Button variant="ghost" size="icon">
-          <Pen />
-        </Button>
+        <EditBlogUser email={email} id={id} role={role} />
         <Button variant="ghost" size="icon">
           <Trash2Icon />
         </Button>

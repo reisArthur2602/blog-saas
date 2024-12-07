@@ -113,7 +113,7 @@ export const CreateBlogUser = ({ slug }: { slug: string }) => {
               name="role"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Categoria</FormLabel>
+                  <FormLabel>Cargo</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}

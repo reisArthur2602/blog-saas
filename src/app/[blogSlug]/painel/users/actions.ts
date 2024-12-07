@@ -40,5 +40,24 @@ export const createBlogUser = async ({
     },
   })
 
-  revalidatePath('/admin')
+  revalidatePath(`/${blogSlug}/painel/users`)
+}
+
+export const editBlogUser = async ({
+  id,
+  role,
+}: {
+  id: string
+  role: UserRole
+}) => {
+  const currentBlogUser = await db.blogUser.findUnique({ where: { id } })
+
+  if (!currentBlogUser) return { error: 'Erro ao atualizar permissão' }
+
+  await db.blogUser.update({
+    where: { id: currentBlogUser?.id },
+    data: { role },
+  })
+
+  revalidatePath(`/${currentBlogUser?.blog_slug}/painel/users`)
 }
