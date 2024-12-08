@@ -2,6 +2,11 @@
 
 import { db } from '@/lib/prisma'
 
+export type TotalPostsPerCategory = {
+  category: string
+  totalPosts: number
+}
+
 export const getDashboardData = async ({
   blogSlug,
   month,
@@ -46,9 +51,20 @@ export const getDashboardData = async ({
     }),
   )
 
+  const getTotalPostsPerCategory: TotalPostsPerCategory[] = (
+    await db.post.groupBy({
+      by: ['category'],
+      where: { blog_slug: blogSlug },
+      _count: {
+        id: true,
+      },
+    })
+  ).map(({ category, _count }) => ({ category, totalPosts: _count.id }))
+
   return {
     totalPostsCurrentBlogByMonth,
     totalUsersCurrentBlog,
     totalPostsMadebyMeCurrentBlog,
+    getTotalPostsPerCategory,
   }
 }
