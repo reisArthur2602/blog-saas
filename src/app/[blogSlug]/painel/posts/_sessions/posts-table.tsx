@@ -6,7 +6,7 @@ import { formatDate } from '@/lib/utils'
 import { ColumnDef } from '@tanstack/react-table'
 import { PostsData } from '../actions'
 import { UpdatePost } from './update-post'
-import DeletePost from './delete-post'
+import { DeletePost } from './delete-post'
 
 type Post = PostsData[0]
 

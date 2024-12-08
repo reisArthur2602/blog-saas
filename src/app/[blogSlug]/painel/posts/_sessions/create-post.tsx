@@ -89,7 +89,9 @@ export const CreatePost = ({ blogSlug }: { blogSlug: string }) => {
       }}
     >
       <SheetTrigger asChild>
-        <Button className="w-fit">Criar Post</Button>
+        <Button className="w-fit" size={'sm'}>
+          Criar Post
+        </Button>
       </SheetTrigger>
 
       <SheetContent className="space-y-6 overflow-y-auto w-full">
