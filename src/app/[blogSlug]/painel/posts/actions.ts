@@ -97,4 +97,14 @@ export const updatePostOnBlog = async ({
   }
 }
 
+export const deletePostOnBlog = async ({ id }: { id: string }) => {
+  try {
+    const { blog_slug: blogSlug } = await db.post.delete({ where: { id } })
+
+    revalidatePath(`/${blogSlug}/painel/posts`)
+  } catch {
+    return { error: 'A publicação não foi encontrada' }
+  }
+}
+
 export type PostsData = ReturnTypeWithoutPromise<typeof getPostsCurrentBlog>
