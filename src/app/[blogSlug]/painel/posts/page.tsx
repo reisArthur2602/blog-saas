@@ -1,12 +1,16 @@
 import { Header, HeaderTitle } from '@/components/ui/header'
 import { CreatePosts } from './_sessions/create-posts'
 
-const Page = () => {
+type Props = {
+  params: { blogSlug: string }
+}
+
+const Page = ({ params: { blogSlug } }: Props) => {
   return (
     <div>
       <Header>
         <HeaderTitle>Publicações</HeaderTitle>
-        <CreatePosts />
+        <CreatePosts blogSlug={blogSlug} />
       </Header>
       <div className="space-y-6 p-6">
         <div>
