@@ -15,6 +15,7 @@ model User {
   created_at DateTime   @default(now())
   updated_at DateTime   @updatedAt
   blogs      BlogUser[]
+  posts      Post[]
 }
 
 model Blog {
@@ -26,11 +27,25 @@ model Blog {
   created_at  DateTime   @default(now())
   updated_at  DateTime   @updatedAt
   users       BlogUser[]
+  posts       Post[]
 }
 
 model BlogUser {
   id         String   @id @default(uuid())
   role       UserRole @default(AUTHOR)
+  blog       Blog     @relation(fields: [blog_slug], references: [slug])
+  blog_slug  String
+  user       User     @relation(fields: [user_id], references: [id])
+  user_id    String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Post {
+  id         String   @id @default(uuid())
+  title      String
+  subtitle   String
+  body       String
   blog       Blog     @relation(fields: [blog_slug], references: [slug])
   blog_slug  String
   user       User     @relation(fields: [user_id], references: [id])
