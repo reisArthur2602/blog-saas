@@ -1,14 +1,12 @@
 'use client'
 
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/ui/data-table'
 import { formatDate, formatRole } from '@/lib/utils'
 import { UserRole } from '@prisma/client'
-
 import { ColumnDef } from '@tanstack/react-table'
-import { Trash2Icon } from 'lucide-react'
 import { EditBlogUser } from './edit-blog-user'
+import { DeleteBlogUser } from './delete-blog-user'
 
 type UserColumn = {
   id: string
@@ -59,9 +57,7 @@ export const columns: ColumnDef<UserColumn>[] = [
     }) => (
       <div className="flex gap-2">
         <EditBlogUser email={email} id={id} role={role} />
-        <Button variant="ghost" size="icon">
-          <Trash2Icon />
-        </Button>
+        <DeleteBlogUser id={id} />
       </div>
     ),
   },

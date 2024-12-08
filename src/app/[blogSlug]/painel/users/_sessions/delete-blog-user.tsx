@@ -11,11 +11,11 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { Trash2Icon } from 'lucide-react'
-import { deletePostOnBlog } from '../actions'
+import { deleteBlogUser } from '../actions'
 
-export const DeletePost = ({ id }: { id: string }) => {
+export const DeleteBlogUser = ({ id }: { id: string }) => {
   const onDelete = async () => {
-    const response = await deletePostOnBlog({ id })
+    const response = await deleteBlogUser({ id })
     if (response?.error) return console.error(response.error)
   }
   return (
@@ -28,11 +28,10 @@ export const DeletePost = ({ id }: { id: string }) => {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Deseja realmente excluir a publicação
+            Deseja realmente excluir o usuário do blog
           </AlertDialogTitle>
           <AlertDialogDescription>
-            Esta ação não poderá ser desfeita, a publicação será excluída do
-            banco de dados.
+            Esta ação não poderá ser desfeita, o usuário será removido do blog
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

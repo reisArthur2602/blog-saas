@@ -61,3 +61,13 @@ export const editBlogUser = async ({
 
   revalidatePath(`/${currentBlogUser?.blog_slug}/painel/users`)
 }
+
+export const deleteBlogUser = async ({ id }: { id: string }) => {
+  try {
+    const { blog_slug: blogSlug } = await db.blogUser.delete({ where: { id } })
+
+    revalidatePath(`/${blogSlug}/painel/users`)
+  } catch {
+    return { error: 'o usuário não foi encontrado' }
+  }
+}
