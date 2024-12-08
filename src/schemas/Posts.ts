@@ -1,3 +1,4 @@
+import { PostCategory } from '@prisma/client'
 import { z } from 'zod'
 
 export const CreatePostSchema = z.object({
@@ -10,7 +11,9 @@ export const CreatePostSchema = z.object({
     .min(1, { message: 'O subtítulo é obrigatório' })
     .max(60, { message: 'Deve ter no máximo 60 caracteres' }),
   body: z.string().min(1, { message: 'O corpo da publicação é obrigatório' }),
+  category: z.nativeEnum(PostCategory),
 })
+
 export const EditPostSchema = z.object({
   title: z
     .string()
@@ -22,6 +25,7 @@ export const EditPostSchema = z.object({
     .max(60, { message: 'Deve ter no máximo 60 caracteres' })
     .optional(),
   body: z.string().optional(),
+  category: z.nativeEnum(PostCategory).optional(),
 })
 
 export type PostInput = z.infer<typeof CreatePostSchema>

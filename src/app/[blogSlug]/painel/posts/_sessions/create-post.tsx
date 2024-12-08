@@ -34,6 +34,32 @@ import ReactQuill from 'react-quill'
 
 import { CreatePostSchema, PostInput } from '@/schemas/Posts'
 import { createPostOnBlog } from '../actions'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
+export const POST_CATEGORIES = [
+  { name: 'Tecnologia', value: 'TECHNOLOGY' },
+  { name: 'Educação', value: 'EDUCATION' },
+  { name: 'Saúde e Bem-Estar', value: 'HEALTH_AND_WELLNESS' },
+  { name: 'Viagens', value: 'TRAVEL' },
+  {
+    name: 'Negócios e Empreendedorismo',
+    value: 'BUSINESS_AND_ENTREPRENEURSHIP',
+  },
+  { name: 'Cultura e Entretenimento', value: 'CULTURE_AND_ENTERTAINMENT' },
+  { name: 'Culinária e Gastronomia', value: 'CULINARY_AND_GASTRONOMY' },
+  { name: 'Estilo de Vida', value: 'LIFESTYLE' },
+  { name: 'Ciência e Inovação', value: 'SCIENCE_AND_INNOVATION' },
+  {
+    name: 'Sustentabilidade e Meio Ambiente',
+    value: 'SUSTAINABILITY_AND_ENVIRONMENT',
+  },
+]
 
 export const CreatePost = ({ blogSlug }: { blogSlug: string }) => {
   const [isOpen, setOpen] = useState(false)
@@ -107,6 +133,36 @@ export const CreatePost = ({ blogSlug }: { blogSlug: string }) => {
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Categoria</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={form.formState.isSubmitting}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma categoria" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="capitalize">
+                      {POST_CATEGORIES.map((category) => (
+                        <SelectItem key={category.value} value={category.value}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
                   <FormMessage />
                 </FormItem>
               )}

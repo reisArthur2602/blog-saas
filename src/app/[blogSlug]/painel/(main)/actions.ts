@@ -1,17 +1,16 @@
 'use server'
 
-import { auth } from '@/lib/auth'
 import { db } from '@/lib/prisma'
 
 export const getDashboardData = async ({
   blogSlug,
   month,
+  userId,
 }: {
   month: string
   blogSlug: string
+  userId: string
 }) => {
-  const currentUser = await auth()
-
   const startMonth = new Date(`2024-${month}-01`)
   const endMonth = new Date(`2024-${month}-31`)
 
@@ -42,7 +41,7 @@ export const getDashboardData = async ({
   const totalPostsMadebyMeCurrentBlog = Number(
     await db.post.count({
       where: {
-        user_id: currentUser?.id,
+        user_id: userId,
       },
     }),
   )

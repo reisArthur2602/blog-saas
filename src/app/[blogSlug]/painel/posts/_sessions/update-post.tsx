@@ -35,10 +35,21 @@ import ReactQuill from 'react-quill'
 import { EditPostInput, EditPostSchema } from '@/schemas/Posts'
 import { updatePostOnBlog } from '../actions'
 import { Pen } from 'lucide-react'
-import { Prisma } from '@prisma/client'
+import { PostCategory, Prisma } from '@prisma/client'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { POST_CATEGORIES } from './create-post'
 
 type UpdatePostProps = {
-  post: Pick<Prisma.PostUpdateInput, 'id' | 'body' | 'title' | 'subtitle'>
+  post: Pick<
+    Prisma.PostUpdateInput,
+    'id' | 'body' | 'title' | 'subtitle' | 'category'
+  >
 }
 
 export const UpdatePost = ({ post }: UpdatePostProps) => {
@@ -50,6 +61,7 @@ export const UpdatePost = ({ post }: UpdatePostProps) => {
       title: post.title as string,
       subtitle: post.subtitle as string,
       body: post.body as string,
+      category: post.category as PostCategory,
     },
   })
 
@@ -66,6 +78,7 @@ export const UpdatePost = ({ post }: UpdatePostProps) => {
       title: post.title as string,
       subtitle: post.subtitle as string,
       body: post.body as string,
+      category: post.category as PostCategory,
     })
   }, [post, form])
 
@@ -124,6 +137,36 @@ export const UpdatePost = ({ post }: UpdatePostProps) => {
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Categoria</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    disabled={form.formState.isSubmitting}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma categoria" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="capitalize">
+                      {POST_CATEGORIES.map((category) => (
+                        <SelectItem key={category.value} value={category.value}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
                   <FormMessage />
                 </FormItem>
               )}

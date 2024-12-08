@@ -1,8 +1,12 @@
 import { Header, HeaderTitle } from '@/components/ui/header'
 import { SelectMonthDashboard } from './_sessions/select-month-dashboard'
 import { redirect } from 'next/navigation'
-import { isMatch } from 'date-fns'
+import { isMatch, format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { getDashboardData } from './actions'
+import { SummaryCard } from './_sessions/summary-card'
+import { Pen, User2, Users2 } from 'lucide-react'
+import { auth } from '@/lib/auth'
 
 type Props = {
   params: { blogSlug: string }
@@ -20,12 +24,22 @@ const Page = async ({
   if (monthIsInvalid)
     redirect(`/${blogSlug}/painel?month=${new Date().getMonth() + 1}`)
 
-  const { totalPostsCurrentBlogByMonth } = await getDashboardData({
+  const currentDateFormated = format(
+    new Date(),
+    "EEEE, d 'de' MMMM 'de' yyyy",
+    { locale: ptBR },
+  )
+  const currentUser = await auth()
+
+  const {
+    totalPostsCurrentBlogByMonth,
+    totalPostsMadebyMeCurrentBlog,
+    totalUsersCurrentBlog,
+  } = await getDashboardData({
     month,
     blogSlug,
+    userId: currentUser!.id,
   })
-
-  console.log(totalPostsCurrentBlogByMonth)
 
   return (
     <div>
@@ -33,6 +47,33 @@ const Page = async ({
         <HeaderTitle>Dashboard</HeaderTitle>
         <SelectMonthDashboard blogSlug={blogSlug} />
       </Header>
+
+      <div className="space-y-6 p-6">
+        <div>
+          <h3 className="font-semibold text-xl capitalize">
+            Olá👋,{currentUser?.name}
+          </h3>
+          <p className="text-muted-foreground text-sm">{currentDateFormated}</p>
+        </div>
+
+        <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <SummaryCard
+            title="Posts feitos por mim"
+            count={totalPostsMadebyMeCurrentBlog}
+            icon={<User2 />}
+          />
+          <SummaryCard
+            title="Usuarios cadastrados"
+            count={totalUsersCurrentBlog}
+            icon={<Users2 />}
+          />
+          <SummaryCard
+            title="Posts feitos no mês"
+            count={totalPostsCurrentBlogByMonth}
+            icon={<Pen />}
+          />
+        </section>
+      </div>
     </div>
   )
 }

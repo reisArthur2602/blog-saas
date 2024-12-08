@@ -10,6 +10,7 @@ export const createPostOnBlog = async ({
   subtitle,
   title,
   body,
+  category,
   blog_slug: blogSlug,
 }: Prisma.PostUncheckedCreateWithoutUserInput) => {
   const currentUser = await auth()
@@ -17,6 +18,7 @@ export const createPostOnBlog = async ({
   await db.post.create({
     data: {
       subtitle,
+      category,
       title,
       body,
       blog_slug: blogSlug,
@@ -47,6 +49,7 @@ export const getPostsCurrentBlog = async ({
         title: true,
         subtitle: true,
         body: true,
+        category: true,
         created_at: true,
         user: { select: { id: true, name: true, email: true } },
       },
@@ -61,6 +64,7 @@ export const getPostsCurrentBlog = async ({
       id: true,
       title: true,
       subtitle: true,
+      category: true,
       body: true,
       created_at: true,
       user: { select: { id: true, name: true, email: true } },
@@ -75,6 +79,7 @@ export const updatePostOnBlog = async ({
   title,
   body,
   subtitle,
+  category,
 }: Prisma.PostUpdateInput) => {
   try {
     const post = await db.post.update({
@@ -83,6 +88,7 @@ export const updatePostOnBlog = async ({
         title,
         body,
         subtitle,
+        category,
       },
     })
     revalidatePath(`/${post.blog_slug}/painel/posts`)

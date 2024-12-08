@@ -40,11 +40,11 @@ export const columns: ColumnDef<Post>[] = [
     header: '',
     cell: ({
       row: {
-        original: { id, body, title, subtitle },
+        original: { id, body, title, subtitle, category },
       },
     }) => (
       <div className="flex gap-2">
-        <UpdatePost post={{ id, body, title, subtitle }} />
+        <UpdatePost post={{ id, body, title, subtitle, category }} />
         <Button variant="ghost" size="icon">
           <Trash2Icon />
         </Button>
