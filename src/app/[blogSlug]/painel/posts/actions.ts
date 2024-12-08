@@ -32,7 +32,30 @@ export const getPostsCurrentBlog = async ({
 }: {
   blogSlug: string
 }) => {
-  const posts = await db.post.findMany({
+  const currentUser = await auth()
+
+  const userPermission = await db.blogUser.findFirst({
+    where: { blog_slug: blogSlug, user_id: currentUser?.id },
+    select: { role: true },
+  })
+
+  if (userPermission?.role === 'AUTHOR') {
+    const currentUserPosts = await db.post.findMany({
+      where: { blog_slug: blogSlug, user_id: currentUser!.id },
+      select: {
+        id: true,
+        title: true,
+        subtitle: true,
+        body: true,
+        created_at: true,
+        user: { select: { id: true, name: true, email: true } },
+      },
+    })
+
+    return currentUserPosts
+  }
+
+  const allUsersPostsCurrentBlog = await db.post.findMany({
     where: { blog_slug: blogSlug },
     select: {
       id: true,
@@ -44,7 +67,7 @@ export const getPostsCurrentBlog = async ({
     },
   })
 
-  return posts
+  return allUsersPostsCurrentBlog
 }
 
 export const updatePostOnBlog = async ({
