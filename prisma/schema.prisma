@@ -42,20 +42,34 @@ model BlogUser {
 }
 
 model Post {
-  id         String   @id @default(uuid())
+  id         String       @id @default(uuid())
   title      String
   subtitle   String
   body       String
-  blog       Blog     @relation(fields: [blog_slug], references: [slug])
+  blog       Blog         @relation(fields: [blog_slug], references: [slug])
   blog_slug  String
-  user       User     @relation(fields: [user_id], references: [id])
+  user       User         @relation(fields: [user_id], references: [id])
   user_id    String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  created_at DateTime     @default(now())
+  updated_at DateTime     @updatedAt
+  category   PostCategory
 }
 
 enum UserRole {
   OWNER
   EDITOR
   AUTHOR
+}
+
+enum PostCategory {
+  TECHNOLOGY
+  EDUCATION
+  HEALTH_AND_WELLNESS
+  TRAVEL
+  BUSINESS_AND_ENTREPRENEURSHIP
+  CULTURE_AND_ENTERTAINMENT
+  CULINARY_AND_GASTRONOMY
+  LIFESTYLE
+  SCIENCE_AND_INNOVATION
+  SUSTAINABILITY_AND_ENVIRONMENT
 }
