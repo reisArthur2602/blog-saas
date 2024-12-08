@@ -48,7 +48,6 @@ export const columns: ColumnDef<UserColumn>[] = [
   },
   {
     id: 'actions',
-    header: 'Ações',
     cell: ({
       row: {
         original: {
