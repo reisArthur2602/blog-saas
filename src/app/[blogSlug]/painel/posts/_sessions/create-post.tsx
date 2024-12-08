@@ -5,7 +5,6 @@ import 'react-quill/dist/quill.snow.css'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
 
@@ -33,13 +32,13 @@ import { Input } from '@/components/ui/input'
 
 import ReactQuill from 'react-quill'
 
-import { CreatePostSchema } from '@/schemas/Posts'
+import { CreatePostSchema, PostInput } from '@/schemas/Posts'
 import { createPostOnBlog } from '../actions'
 
-export const CreatePosts = ({ blogSlug }: { blogSlug: string }) => {
+export const CreatePost = ({ blogSlug }: { blogSlug: string }) => {
   const [isOpen, setOpen] = useState(false)
 
-  const form = useForm<z.infer<typeof CreatePostSchema>>({
+  const form = useForm<PostInput>({
     resolver: zodResolver(CreatePostSchema),
     defaultValues: {
       title: '',

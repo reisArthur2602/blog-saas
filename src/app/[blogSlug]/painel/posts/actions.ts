@@ -3,23 +3,28 @@
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/prisma'
 import { ReturnTypeWithoutPromise } from '@/types/return-type-without-promise'
+import { Prisma } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 
-type PostCreateInput = {
-  title: string
-  subtitle: string
-  body: string
-  blog_slug: string
-}
-
-export const createPostOnBlog = async (data: PostCreateInput) => {
+export const createPostOnBlog = async ({
+  subtitle,
+  title,
+  body,
+  blog_slug: blogSlug,
+}: Prisma.PostUncheckedCreateWithoutUserInput) => {
   const currentUser = await auth()
 
   await db.post.create({
-    data: { ...data, user_id: currentUser!.id },
+    data: {
+      subtitle,
+      title,
+      body,
+      blog_slug: blogSlug,
+      user_id: currentUser!.id,
+    },
   })
 
-  revalidatePath(`/${data.blog_slug}/painel/posts`)
+  revalidatePath(`/${blogSlug}/painel/posts`)
 }
 
 export const getPostsCurrentBlog = async ({
@@ -40,6 +45,27 @@ export const getPostsCurrentBlog = async ({
   })
 
   return posts
+}
+
+export const updatePostOnBlog = async ({
+  id,
+  title,
+  body,
+  subtitle,
+}: Prisma.PostUpdateInput) => {
+  try {
+    const post = await db.post.update({
+      where: { id: id as string },
+      data: {
+        title,
+        body,
+        subtitle,
+      },
+    })
+    revalidatePath(`/${post.blog_slug}/painel/posts`)
+  } catch {
+    return { error: 'O post não foi encontrado' }
+  }
 }
 
 export type PostsData = ReturnTypeWithoutPromise<typeof getPostsCurrentBlog>
