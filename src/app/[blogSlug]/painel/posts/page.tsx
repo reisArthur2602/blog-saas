@@ -1,11 +1,15 @@
 import { Header, HeaderTitle } from '@/components/ui/header'
 import { CreatePosts } from './_sessions/create-posts'
+import { PostsTable } from './_sessions/posts-table'
+import { getPostsCurrentBlog } from './actions'
 
 type Props = {
   params: { blogSlug: string }
 }
 
-const Page = ({ params: { blogSlug } }: Props) => {
+const Page = async ({ params: { blogSlug } }: Props) => {
+  const postsData = await getPostsCurrentBlog({ blogSlug })
+
   return (
     <div>
       <Header>
@@ -19,6 +23,7 @@ const Page = ({ params: { blogSlug } }: Props) => {
             Gerencie as publicações do blog
           </p>
         </div>
+        <PostsTable data={postsData} />
       </div>
     </div>
   )
