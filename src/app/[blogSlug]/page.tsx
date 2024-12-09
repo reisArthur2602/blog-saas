@@ -1,7 +1,9 @@
-import React from 'react'
+type Props = {
+  params: { blogSlug: string }
+}
 
-const Page = () => {
-  return <div>Page</div>
+const Page = async ({ params: { blogSlug } }: Props) => {
+  return <div>{blogSlug}</div>
 }
 
 export default Page

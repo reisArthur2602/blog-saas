@@ -43,18 +43,16 @@ export const getDashboardData = async ({
     }),
   )
   // card
-  const totalPostsMadebyMeCurrentBlog = Number(
+  const totalPostsMadebyMeCurrentBlogByMonth = Number(
     await db.post.count({
-      where: {
-        user_id: userId,
-      },
+      where: { user_id: userId, ...where },
     }),
   )
 
   const getTotalPostsPerCategory: TotalPostsPerCategory[] = (
     await db.post.groupBy({
       by: ['category'],
-      where: { blog_slug: blogSlug },
+      where: { user_id: userId, ...where },
       _count: {
         id: true,
       },
@@ -64,7 +62,7 @@ export const getDashboardData = async ({
   return {
     totalPostsCurrentBlogByMonth,
     totalUsersCurrentBlog,
-    totalPostsMadebyMeCurrentBlog,
+    totalPostsMadebyMeCurrentBlogByMonth,
     getTotalPostsPerCategory,
   }
 }

@@ -33,7 +33,7 @@ const Page = async ({
 
   const {
     totalPostsCurrentBlogByMonth,
-    totalPostsMadebyMeCurrentBlog,
+    totalPostsMadebyMeCurrentBlogByMonth,
     totalUsersCurrentBlog,
   } = await getDashboardData({
     month,
@@ -58,17 +58,17 @@ const Page = async ({
 
         <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <SummaryCard
-            title="Posts feitos por mim"
-            count={totalPostsMadebyMeCurrentBlog}
-            icon={<User2 />}
-          />
-          <SummaryCard
             title="Usuarios cadastrados"
             count={totalUsersCurrentBlog}
             icon={<Users2 />}
           />
           <SummaryCard
-            title="Posts feitos no mês"
+            title="Posts feitos por mim"
+            count={totalPostsMadebyMeCurrentBlogByMonth}
+            icon={<User2 />}
+          />
+          <SummaryCard
+            title="Total de publicações"
             count={totalPostsCurrentBlogByMonth}
             icon={<Pen />}
           />
