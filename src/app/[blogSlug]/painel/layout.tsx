@@ -37,9 +37,9 @@ const BlogLayout = async ({
   }
 
   return (
-    <div className="grid grid-cols-[20rem_1fr] h-screen">
+    <div className="grid grid-cols-[18rem_1fr] h-screen">
       <BlogSidebar data={data} />
-      <main>{children}</main>
+      <main className="overflow-y-auto scrollbar-hidden">{children}</main>
     </div>
   )
 }

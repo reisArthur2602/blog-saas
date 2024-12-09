@@ -68,6 +68,7 @@ export const getPostsCurrentBlog = async ({
       created_at: true,
       user: { select: { id: true, name: true, email: true } },
     },
+    orderBy: { created_at: 'asc' },
   })
 
   return currentUserPosts
