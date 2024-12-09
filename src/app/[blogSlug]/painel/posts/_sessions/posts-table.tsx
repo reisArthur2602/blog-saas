@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge'
 import { DataTable } from '@/components/ui/data-table'
-import { formatDate } from '@/lib/utils'
+import { formatCategoryPost, formatDate } from '@/lib/utils'
 import { ColumnDef } from '@tanstack/react-table'
 import { PostsData } from '../actions'
 import { UpdatePost } from './update-post'
@@ -19,14 +19,18 @@ export const columns: ColumnDef<Post>[] = [
   {
     accessorKey: 'user.name',
     header: 'Autor',
-    cell: ({ row }) => (
-      <div className="space-x-2">
-        <Badge className="capitalize"> {row.original.user.name}</Badge>
-        <Badge variant={`outline`}> {row.original.user.email}</Badge>
-      </div>
-    ),
+    cell: ({ row }) => <span> {row.original.user.name}</span>,
   },
 
+  {
+    accessorKey: 'category',
+    header: 'Categoria',
+    cell: ({ row }) => (
+      <Badge variant={'outline'}>
+        {formatCategoryPost(row.original.category)}
+      </Badge>
+    ),
+  },
   {
     accessorKey: 'created_at',
     header: 'Data',
