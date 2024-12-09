@@ -13,7 +13,7 @@ import { Home, Inbox, Settings, Users } from 'lucide-react'
 import { UserDropdown } from './user-dropdown'
 import { usePathname } from 'next/navigation'
 
-import { hasPermission } from '@/lib/permissions'
+import { hasPermissionClientSide } from '@/lib/permissions'
 import { UserRole } from '@prisma/client'
 
 type BlogSidebarProps = {
@@ -45,7 +45,10 @@ export const BlogSidebar = ({ data }: BlogSidebarProps) => {
       name: 'Inicio',
       href: baseUrlBlog,
       icon: <Home size={16} />,
-      hasPermission: true,
+      hasPermission: hasPermissionClientSide(data.blog.blogUser.role, [
+        'OWNER',
+        'EDITOR',
+      ]),
     },
     {
       name: 'Publicações',
@@ -57,13 +60,17 @@ export const BlogSidebar = ({ data }: BlogSidebarProps) => {
       name: 'Usuários',
       href: baseUrlBlog + '/users',
       icon: <Users size={16} />,
-      hasPermission: hasPermission(data.blog.blogUser.role, ['OWNER']),
+      hasPermission: hasPermissionClientSide(data.blog.blogUser.role, [
+        'OWNER',
+      ]),
     },
     {
       name: 'Configurações',
       href: baseUrlBlog + '/settings',
       icon: <Settings size={16} />,
-      hasPermission: hasPermission(data.blog.blogUser.role, ['OWNER']),
+      hasPermission: hasPermissionClientSide(data.blog.blogUser.role, [
+        'OWNER',
+      ]),
     },
   ]
 

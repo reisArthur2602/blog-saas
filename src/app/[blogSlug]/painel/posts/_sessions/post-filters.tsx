@@ -9,35 +9,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { formatRole } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { USER_ROLES } from './create-blog-user'
+
 import { Button } from '@/components/ui/button'
 import { Filter, X } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { POST_CATEGORIES } from './create-post'
 
-const UsersFiltersSchema = z.object({
+const PostsFiltersSchema = z.object({
   name: z.string().optional(),
-  role: z.string().optional(),
+  category: z.string().optional(),
 })
 
-type UsersFiltersInput = z.infer<typeof UsersFiltersSchema>
+type PostsFiltersInput = z.infer<typeof PostsFiltersSchema>
 
-export const UsersFilters = ({ blogSlug }: { blogSlug: string }) => {
+export const PostFilters = ({ blogSlug }: { blogSlug: string }) => {
   const searchParams = useSearchParams()
   const name = searchParams.get('name') ?? ''
-  const role = searchParams.get('role') ?? ''
+  const category = searchParams.get('category') ?? ''
 
   const { push } = useRouter()
 
-  const form = useForm<UsersFiltersInput>({
-    resolver: zodResolver(UsersFiltersSchema),
+  const form = useForm<PostsFiltersInput>({
+    resolver: zodResolver(PostsFiltersSchema),
     defaultValues: {
       name,
-      role,
+      category,
     },
   })
 
@@ -45,14 +45,14 @@ export const UsersFilters = ({ blogSlug }: { blogSlug: string }) => {
     const params = new URLSearchParams()
 
     if (data.name) params.set('name', data.name)
-    if (data.role) params.set('role', data.role)
+    if (data.category) params.set('category', data.category)
 
-    push(`/${blogSlug}/painel/users?${params.toString()}`)
+    push(`/${blogSlug}/painel/posts?${params.toString()}`)
   })
 
   const onClearFilters = () => {
     form.reset()
-    push(`/${blogSlug}/painel/users`)
+    push(`/${blogSlug}/painel/posts`)
   }
 
   return (
@@ -70,7 +70,7 @@ export const UsersFilters = ({ blogSlug }: { blogSlug: string }) => {
                 <FormItem>
                   <FormControl>
                     <Input
-                      placeholder="Buscar por nome"
+                      placeholder="Buscar por autor"
                       disabled={form.formState.isSubmitting}
                       {...field}
                     />
@@ -81,19 +81,19 @@ export const UsersFilters = ({ blogSlug }: { blogSlug: string }) => {
 
             <FormField
               control={form.control}
-              name="role"
+              name="category"
               render={({ field }) => (
                 <FormItem>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Cargo" />
+                        <SelectValue placeholder="Categoria" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="capitalize w-fit">
-                      {USER_ROLES.map(({ role }) => (
-                        <SelectItem key={role} value={role}>
-                          {formatRole(role)}
+                      {POST_CATEGORIES.map(({ value, name }) => (
+                        <SelectItem key={value} value={value}>
+                          {name}
                         </SelectItem>
                       ))}
                     </SelectContent>

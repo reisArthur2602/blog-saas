@@ -1,10 +1,16 @@
 'use server'
 
 import { auth } from '@/lib/auth'
+import { hasPermissionServerSide } from '@/lib/permissions'
 import { db } from '@/lib/prisma'
 import { ReturnTypeWithoutPromise } from '@/types/return-type-without-promise'
-import { Prisma } from '@prisma/client'
+import { PostCategory, Prisma } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
+
+type Filters = {
+  name?: string
+  category?: PostCategory
+}
 
 export const createPostOnBlog = async ({
   subtitle,
@@ -31,47 +37,40 @@ export const createPostOnBlog = async ({
 
 export const getPostsCurrentBlog = async ({
   blogSlug,
+  filters,
 }: {
   blogSlug: string
+  filters: Filters
 }) => {
   const currentUser = await auth()
 
-  const userPermission = await db.blogUser.findFirst({
-    where: { blog_slug: blogSlug, user_id: currentUser?.id },
-    select: { role: true },
+  const currentUserIsAuthor = await hasPermissionServerSide({
+    role: 'AUTHOR',
+    blogSlug,
+    userId: currentUser!.id,
   })
 
-  if (userPermission?.role === 'AUTHOR') {
-    const currentUserPosts = await db.post.findMany({
-      where: { blog_slug: blogSlug, user_id: currentUser!.id },
-      select: {
-        id: true,
-        title: true,
-        subtitle: true,
-        body: true,
-        category: true,
-        created_at: true,
-        user: { select: { id: true, name: true, email: true } },
-      },
-    })
-
-    return currentUserPosts
-  }
-
-  const allUsersPostsCurrentBlog = await db.post.findMany({
-    where: { blog_slug: blogSlug },
+  const currentUserPosts = await db.post.findMany({
+    where: {
+      blog_slug: blogSlug,
+      user_id: currentUserIsAuthor ? currentUser!.id : undefined,
+      user: filters.name
+        ? { name: { contains: filters.name, mode: 'insensitive' } }
+        : undefined,
+      category: filters.category ?? undefined,
+    },
     select: {
       id: true,
       title: true,
       subtitle: true,
-      category: true,
       body: true,
+      category: true,
       created_at: true,
       user: { select: { id: true, name: true, email: true } },
     },
   })
 
-  return allUsersPostsCurrentBlog
+  return currentUserPosts
 }
 
 export const updatePostOnBlog = async ({
