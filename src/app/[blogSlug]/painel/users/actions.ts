@@ -4,9 +4,26 @@ import { db } from '@/lib/prisma'
 import { UserRole } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 
-export const getBlogsUsersCurrentBlog = async (slug: string) => {
+type Filters = {
+  name?: string
+  role?: UserRole
+}
+
+export const getBlogsUsersCurrentBlog = async ({
+  slug,
+  filters,
+}: {
+  slug: string
+  filters: Filters
+}) => {
   const blogsUsers = await db.blogUser.findMany({
-    where: { blog_slug: slug },
+    where: {
+      blog_slug: slug,
+      user: filters.name
+        ? { name: { contains: filters.name, mode: 'insensitive' } }
+        : undefined,
+      role: filters.role ?? undefined,
+    },
     select: {
       id: true,
       role: true,

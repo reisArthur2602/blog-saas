@@ -3,15 +3,29 @@ import { getBlogsUsersCurrentBlog } from './actions'
 
 import { CreateBlogUser } from './_sessions/create-blog-user'
 import { BlogUsersTable } from './_sessions/blog-users-table'
+import { UsersFilters } from './_sessions/users-filters'
+import { UserRole } from '@prisma/client'
 
 type Props = {
   params: {
     blogSlug: string
   }
+  searchParams: {
+    name?: string
+    role?: UserRole
+  }
 }
 
-const Page = async ({ params: { blogSlug } }: Props) => {
-  const blogsUsersCurrentBlog = await getBlogsUsersCurrentBlog(blogSlug)
+const Page = async ({
+  params: { blogSlug },
+  searchParams: { name, role },
+}: Props) => {
+  const filtersParams = { name, role }
+
+  const blogsUsersCurrentBlog = await getBlogsUsersCurrentBlog({
+    slug: blogSlug,
+    filters: filtersParams,
+  })
 
   return (
     <div>
@@ -26,6 +40,8 @@ const Page = async ({ params: { blogSlug } }: Props) => {
             Gerencie os usuário e suas permissões no blog
           </p>
         </div>
+        <UsersFilters blogSlug={blogSlug} />
+
         <BlogUsersTable data={blogsUsersCurrentBlog} />
       </div>
     </div>

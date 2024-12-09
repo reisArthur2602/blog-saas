@@ -39,7 +39,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { formatRole } from '@/lib/utils'
 import { BlogUserInput, CreateBlogUserSchema } from '@/schemas/BlogUser'
 
-const USER_ROLES: { role: UserRole }[] = [
+export const USER_ROLES: { role: UserRole }[] = [
   { role: 'AUTHOR' },
   { role: 'EDITOR' },
   { role: 'OWNER' },
