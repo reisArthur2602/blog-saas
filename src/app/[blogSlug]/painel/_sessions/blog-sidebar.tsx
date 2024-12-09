@@ -9,7 +9,7 @@ import {
   SidebarNav,
   SidebarNavLink,
 } from '@/components/ui/sidebar'
-import { Home, Inbox, Settings, Users } from 'lucide-react'
+import { Home, Inbox, Settings2, Users } from 'lucide-react'
 import { UserDropdown } from './user-dropdown'
 import { usePathname } from 'next/navigation'
 
@@ -67,7 +67,7 @@ export const BlogSidebar = ({ data }: BlogSidebarProps) => {
     {
       name: 'Configurações',
       href: baseUrlBlog + '/settings',
-      icon: <Settings size={16} />,
+      icon: <Settings2 size={16} />,
       hasPermission: hasPermissionClientSide(data.blog.blogUser.role, [
         'OWNER',
       ]),
