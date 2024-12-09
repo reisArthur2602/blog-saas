@@ -7,6 +7,8 @@ import { UserRole } from '@prisma/client'
 import { ColumnDef } from '@tanstack/react-table'
 import { EditBlogUser } from './edit-blog-user'
 import { DeleteBlogUser } from './delete-blog-user'
+import { Button } from '@/components/ui/button'
+import { Search } from 'lucide-react'
 
 type UserColumn = {
   id: string
@@ -21,6 +23,15 @@ type UserColumn = {
 }
 
 export const columns: ColumnDef<UserColumn>[] = [
+  {
+    accessorKey: 'details',
+    header: '',
+    cell: () => (
+      <Button variant={`outline`} size={`icon`}>
+        <Search size={16} />
+      </Button>
+    ),
+  },
   {
     accessorKey: 'user.name',
     header: 'Nome',
@@ -55,7 +66,7 @@ export const columns: ColumnDef<UserColumn>[] = [
         },
       },
     }) => (
-      <div className="flex gap-2">
+      <div className="flex gap-4">
         <EditBlogUser email={email} id={id} role={role} />
         <DeleteBlogUser id={id} />
       </div>

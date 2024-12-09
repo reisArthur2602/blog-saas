@@ -10,7 +10,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Trash2Icon } from 'lucide-react'
+import { X } from 'lucide-react'
 import { deleteBlogUser } from '../actions'
 
 export const DeleteBlogUser = ({ id }: { id: string }) => {
@@ -21,8 +21,8 @@ export const DeleteBlogUser = ({ id }: { id: string }) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Trash2Icon />
+        <Button variant="ghost" size="sm">
+          <X /> Deletar
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

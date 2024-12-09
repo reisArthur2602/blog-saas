@@ -56,76 +56,74 @@ export const PostFilters = ({ blogSlug }: { blogSlug: string }) => {
   }
 
   return (
-    <div>
-      <Form {...form}>
-        <form
-          className="w-full flex items-center justify-between"
-          onSubmit={onFilter}
-        >
-          <div className="flex items-center gap-2">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
+    <Form {...form}>
+      <form
+        className="w-full flex items-center justify-between"
+        onSubmit={onFilter}
+      >
+        <div className="grid grid-cols-[300px_280px] gap-2 ">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    placeholder="Buscar por autor"
+                    disabled={form.formState.isSubmitting}
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
-                    <Input
-                      placeholder="Buscar por autor"
-                      disabled={form.formState.isSubmitting}
-                      {...field}
-                    />
+                    <SelectTrigger>
+                      <SelectValue placeholder="Categoria" />
+                    </SelectTrigger>
                   </FormControl>
-                </FormItem>
-              )}
-            />
+                  <SelectContent className="capitalize truncate">
+                    {POST_CATEGORIES.map(({ value, name }) => (
+                      <SelectItem key={value} value={value}>
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
+        </div>
 
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Categoria" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="capitalize w-fit">
-                      {POST_CATEGORIES.map(({ value, name }) => (
-                        <SelectItem key={value} value={value}>
-                          {name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              className="w-fit"
-              type="button"
-              onClick={onClearFilters}
-              size={'sm'}
-            >
-              <X />
-              <span>Remover Filtros</span>
-            </Button>
-            <Button
-              type="submit"
-              variant="secondary"
-              className="w-fit"
-              size={'sm'}
-            >
-              <Filter />
-              <span>Filtrar Resultados</span>
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            className="w-fit"
+            type="button"
+            onClick={onClearFilters}
+            size={'sm'}
+          >
+            <X />
+            <span>Remover Filtros</span>
+          </Button>
+          <Button
+            type="submit"
+            variant="secondary"
+            className="w-fit"
+            size={'sm'}
+          >
+            <Filter />
+            <span>Filtrar Resultados</span>
+          </Button>
+        </div>
+      </form>
+    </Form>
   )
 }

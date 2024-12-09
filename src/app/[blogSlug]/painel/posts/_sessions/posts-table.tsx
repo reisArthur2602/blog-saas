@@ -7,10 +7,21 @@ import { ColumnDef } from '@tanstack/react-table'
 import { PostsData } from '../actions'
 import { UpdatePost } from './update-post'
 import { DeletePost } from './delete-post'
+import { Button } from '@/components/ui/button'
+import { Search } from 'lucide-react'
 
 type Post = PostsData[0]
 
 export const columns: ColumnDef<Post>[] = [
+  {
+    accessorKey: 'details',
+    header: '',
+    cell: () => (
+      <Button variant={`outline`} size={`icon`}>
+        <Search size={16} />
+      </Button>
+    ),
+  },
   {
     accessorKey: 'title',
     header: 'Título',
@@ -44,7 +55,7 @@ export const columns: ColumnDef<Post>[] = [
         original: { id, body, title, subtitle, category },
       },
     }) => (
-      <div className="flex gap-2">
+      <div className="flex gap-4">
         <UpdatePost post={{ id, body, title, subtitle, category }} />
         <DeletePost id={id} />
       </div>

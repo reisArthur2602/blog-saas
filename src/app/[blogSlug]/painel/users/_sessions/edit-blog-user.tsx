@@ -61,8 +61,8 @@ export const EditBlogUser = ({
   return (
     <Sheet open={isOpen} onOpenChange={(open) => setOpen(open)}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Pen />
+        <Button variant="outline" size="sm">
+          <Pen /> Editar
         </Button>
       </SheetTrigger>
 

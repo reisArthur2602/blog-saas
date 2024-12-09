@@ -91,8 +91,8 @@ export const UpdatePost = ({ post }: UpdatePostProps) => {
       }}
     >
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Pen />
+        <Button variant="outline" size="sm">
+          <Pen /> Editar
         </Button>
       </SheetTrigger>
 
