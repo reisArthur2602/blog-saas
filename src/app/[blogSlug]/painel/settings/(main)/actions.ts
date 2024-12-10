@@ -33,3 +33,10 @@ export const updateBlog = async (input: UpdateBlogInput) => {
 
   revalidatePath(`/${input?.slug}/painel/settings`)
 }
+
+export const deleteBlog = async (slug: string) => {
+  await db.post.deleteMany({ where: { blog_slug: slug } })
+  await db.blogUser.deleteMany({ where: { blog_slug: slug } })
+  await db.blog.delete({ where: { slug } })
+  revalidatePath(`/admin`)
+}
