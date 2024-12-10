@@ -32,8 +32,7 @@ import { Input } from '@/components/ui/input'
 
 import ReactQuill from 'react-quill'
 
-import { CreatePostSchema, PostInput } from '@/schemas/Posts'
-import { createPostOnBlog } from '../actions'
+import { createPost } from '../actions'
 import {
   Select,
   SelectContent,
@@ -41,25 +40,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-
-export const POST_CATEGORIES = [
-  { name: 'Tecnologia', value: 'TECHNOLOGY' },
-  { name: 'Educação', value: 'EDUCATION' },
-  { name: 'Saúde e Bem-Estar', value: 'HEALTH_AND_WELLNESS' },
-  { name: 'Viagens', value: 'TRAVEL' },
-  {
-    name: 'Negócios e Empreendedorismo',
-    value: 'BUSINESS_AND_ENTREPRENEURSHIP',
-  },
-  { name: 'Cultura e Entretenimento', value: 'CULTURE_AND_ENTERTAINMENT' },
-  { name: 'Culinária e Gastronomia', value: 'CULINARY_AND_GASTRONOMY' },
-  { name: 'Estilo de Vida', value: 'LIFESTYLE' },
-  { name: 'Ciência e Inovação', value: 'SCIENCE_AND_INNOVATION' },
-  {
-    name: 'Sustentabilidade e Meio Ambiente',
-    value: 'SUSTAINABILITY_AND_ENVIRONMENT',
-  },
-]
+import { POST_CATEGORIES } from '../contants'
+import { formatCategoryPost } from '@/lib/utils'
+import { toast } from 'sonner'
+import { CreatePostSchema, PostInput } from '../schemas'
 
 export const CreatePost = ({ blogSlug }: { blogSlug: string }) => {
   const [isOpen, setOpen] = useState(false)
@@ -73,12 +57,14 @@ export const CreatePost = ({ blogSlug }: { blogSlug: string }) => {
     },
   })
 
-  const onSubmit = form.handleSubmit(async (data) => {
-    await createPostOnBlog({ ...data, blog_slug: blogSlug })
-    console.log('A publicação foi criada com sucesso!')
+  const isLoading = form.formState.isSubmitting
+
+  const onSubmit = async (data: PostInput) => {
+    await createPost({ ...data, blog_slug: blogSlug })
+    toast.success('A publicação foi criada com sucesso!')
     form.reset()
     setOpen(false)
-  })
+  }
 
   return (
     <Sheet
@@ -103,7 +89,7 @@ export const CreatePost = ({ blogSlug }: { blogSlug: string }) => {
         </SheetHeader>
 
         <Form {...form}>
-          <form className="space-y-4" onSubmit={onSubmit}>
+          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
               control={form.control}
               name="title"
@@ -113,7 +99,7 @@ export const CreatePost = ({ blogSlug }: { blogSlug: string }) => {
                   <FormControl>
                     <Input
                       placeholder="Título"
-                      disabled={form.formState.isSubmitting}
+                      disabled={isLoading}
                       {...field}
                     />
                   </FormControl>
@@ -131,7 +117,7 @@ export const CreatePost = ({ blogSlug }: { blogSlug: string }) => {
                   <FormControl>
                     <Input
                       placeholder="Subtítulo"
-                      disabled={form.formState.isSubmitting}
+                      disabled={isLoading}
                       {...field}
                     />
                   </FormControl>
@@ -158,8 +144,12 @@ export const CreatePost = ({ blogSlug }: { blogSlug: string }) => {
                     </FormControl>
                     <SelectContent className="capitalize">
                       {POST_CATEGORIES.map((category) => (
-                        <SelectItem key={category.value} value={category.value}>
-                          {category.name}
+                        <SelectItem
+                          key={category}
+                          value={category}
+                          disabled={isLoading}
+                        >
+                          {formatCategoryPost(category)}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -181,7 +171,7 @@ export const CreatePost = ({ blogSlug }: { blogSlug: string }) => {
                       theme="snow"
                       value={field.value}
                       onChange={field.onChange}
-                      readOnly={form.formState.isSubmitting}
+                      readOnly={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -190,12 +180,16 @@ export const CreatePost = ({ blogSlug }: { blogSlug: string }) => {
             />
 
             <SheetFooter className="grid gap-3 sm:grid-cols-2 sm:gap-0">
-              <Button type="submit" className="w-full">
-                Salvar
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Salvando...' : 'Salvar'}
               </Button>
 
               <SheetClose className="w-full" asChild>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={isLoading}
+                >
                   Cancelar
                 </Button>
               </SheetClose>

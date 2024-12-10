@@ -31,15 +31,12 @@ const Page = async ({
   )
   const currentUser = await auth()
 
-  const {
-    totalPostsCurrentBlogByMonth,
-    totalPostsMadebyMeCurrentBlogByMonth,
-    totalUsersCurrentBlog,
-  } = await getDashboardData({
-    month,
-    blogSlug,
-    userId: currentUser!.id,
-  })
+  const { totalPostsByMonth, totalUsers, totalPostsMadeByUserByMonth } =
+    await getDashboardData({
+      month,
+      blogSlug,
+      userId: currentUser!.id,
+    })
 
   return (
     <div>
@@ -59,17 +56,17 @@ const Page = async ({
         <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <SummaryCard
             title="Usuarios cadastrados"
-            count={totalUsersCurrentBlog}
+            count={totalUsers}
             icon={<Users2 />}
           />
           <SummaryCard
             title="Posts feitos por mim"
-            count={totalPostsMadebyMeCurrentBlogByMonth}
+            count={totalPostsMadeByUserByMonth}
             icon={<User2 />}
           />
           <SummaryCard
             title="Total de publicações"
-            count={totalPostsCurrentBlogByMonth}
+            count={totalPostsByMonth}
             icon={<Pen />}
           />
         </section>

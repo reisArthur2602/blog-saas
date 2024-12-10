@@ -9,18 +9,17 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-
 import { Input } from '@/components/ui/input'
-
-import { UserSignupInput, UserSignUpSchema } from '@/schemas/User'
-
 import { zodResolver } from '@hookform/resolvers/zod'
-
 import { useForm } from 'react-hook-form'
-
 import { signup } from '../actions'
+import { toast } from 'sonner'
+
+import { UserSignupInput, UserSignUpSchema } from '../schema'
+import { useRouter } from 'next/navigation'
 
 export const FormSignUp = () => {
+  const { push } = useRouter()
   const form = useForm<UserSignupInput>({
     resolver: zodResolver(UserSignUpSchema),
     defaultValues: {
@@ -29,17 +28,27 @@ export const FormSignUp = () => {
       password: '',
     },
   })
+  const isLoading = form.formState.isSubmitting
 
-  const onSubmit = form.handleSubmit(async (data) => {
-    const response = await signup(data)
-    if (response?.error) return console.error(response.error)
-  })
+  const onSubmit = async (data: UserSignupInput) => {
+    try {
+      const response = await signup(data)
+      if (response?.error) {
+        toast.error(response.error)
+        return
+      }
+      toast.success('Cadastro realizado com sucesso!')
+      push(`/auth/signin`)
+    } catch {
+      toast.error('Erro inesperado ao tentar cadastrar. Tente novamente.')
+    }
+  }
 
   return (
     <Form {...form}>
       {/* email */}
 
-      <form className="grid gap-6" onSubmit={onSubmit}>
+      <form className="grid gap-6" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="name"
@@ -49,8 +58,8 @@ export const FormSignUp = () => {
               <FormControl>
                 <Input
                   placeholder="Digite seu nome"
+                  disabled={isLoading}
                   {...field}
-                  disabled={form.formState.isSubmitting}
                 />
               </FormControl>
               <FormMessage />
@@ -66,8 +75,8 @@ export const FormSignUp = () => {
               <FormControl>
                 <Input
                   placeholder="Digite seu email"
+                  disabled={isLoading}
                   {...field}
-                  disabled={form.formState.isSubmitting}
                 />
               </FormControl>
               <FormMessage />
@@ -86,8 +95,8 @@ export const FormSignUp = () => {
                 <Input
                   placeholder="******"
                   type="password"
+                  disabled={isLoading}
                   {...field}
-                  disabled={form.formState.isSubmitting}
                 />
               </FormControl>
               <FormMessage />
@@ -95,7 +104,9 @@ export const FormSignUp = () => {
           )}
         />
 
-        <Button disabled={form.formState.isSubmitting}>Cadastrar</Button>
+        <Button disabled={isLoading}>
+          {isLoading ? 'Cadastrando...' : 'Cadastrar'}
+        </Button>
       </form>
     </Form>
   )

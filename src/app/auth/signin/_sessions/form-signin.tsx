@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/form'
 
 import { Input } from '@/components/ui/input'
-import { UserSigninInput, UserSignInSchema } from '@/schemas/User'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -19,7 +18,12 @@ import { useForm } from 'react-hook-form'
 
 import { signin } from '../actions'
 
+import { UserSigninInput, UserSignInSchema } from '../schema'
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
+
 export const FormSignin = () => {
+  const { push } = useRouter()
   const form = useForm<UserSigninInput>({
     resolver: zodResolver(UserSignInSchema),
     defaultValues: {
@@ -28,16 +32,27 @@ export const FormSignin = () => {
     },
   })
 
-  const onSubmit = form.handleSubmit(async (data) => {
-    const response = await signin(data)
-    if (response?.error) return console.error(response.error)
-  })
+  const isLoading = form.formState.isSubmitting
+
+  const onSubmit = async (data: UserSigninInput) => {
+    try {
+      const response = await signin(data)
+      if (response?.error) {
+        toast.error(response.error)
+        return
+      }
+      toast.success('Login realizado com sucesso!')
+      push(`/admin`)
+    } catch {
+      toast.error('Ocorreu um erro ao tentar acessar. Tente novamente.')
+    }
+  }
 
   return (
     <Form {...form}>
       {/* email */}
 
-      <form className="grid gap-6" onSubmit={onSubmit}>
+      <form className="grid gap-6" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="email"
@@ -47,7 +62,7 @@ export const FormSignin = () => {
               <FormControl>
                 <Input
                   placeholder="Digite seu email"
-                  disabled={form.formState.isSubmitting}
+                  disabled={isLoading}
                   {...field}
                 />
               </FormControl>
@@ -67,7 +82,7 @@ export const FormSignin = () => {
                 <Input
                   placeholder="******"
                   type="password"
-                  disabled={form.formState.isSubmitting}
+                  disabled={isLoading}
                   {...field}
                 />
               </FormControl>
@@ -76,7 +91,9 @@ export const FormSignin = () => {
           )}
         />
 
-        <Button disabled={form.formState.isSubmitting}>Acessar</Button>
+        <Button disabled={isLoading}>
+          {isLoading ? 'Acessando...' : 'Acessar'}
+        </Button>
       </form>
     </Form>
   )

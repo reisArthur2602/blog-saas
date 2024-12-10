@@ -7,62 +7,74 @@ export type TotalPostsPerCategory = {
   totalPosts: number
 }
 
+type DashboardDataParams = {
+  blogSlug: string
+  month: string
+  userId: string
+}
+
+const getMonthDateRange = (month: string): { start: Date; end: Date } => {
+  const start = new Date(`2024-${month}-01`)
+  const end = new Date(`2024-${month}-31`)
+  return { start, end }
+}
+
+const getTotalPosts = async (where: object): Promise<number> => {
+  return db.post.count({ where })
+}
+
+const getTotalUsers = async (blogSlug: string): Promise<number> => {
+  return db.blogUser.count({
+    where: { blog_slug: blogSlug },
+  })
+}
+
+const getPostsPerCategory = async (
+  where: object,
+): Promise<TotalPostsPerCategory[]> => {
+  const groupedData = await db.post.groupBy({
+    by: ['category'],
+    where,
+    _count: { id: true },
+  })
+  return groupedData.map(({ category, _count }) => ({
+    category,
+    totalPosts: _count.id,
+  }))
+}
+
 export const getDashboardData = async ({
   blogSlug,
   month,
   userId,
-}: {
-  month: string
-  blogSlug: string
-  userId: string
-}) => {
-  const startMonth = new Date(`2024-${month}-01`)
-  const endMonth = new Date(`2024-${month}-31`)
+}: DashboardDataParams) => {
+  const { start, end } = getMonthDateRange(month)
 
-  const where = {
+  const baseWhere = {
     blog_slug: blogSlug,
     created_at: {
-      gte: startMonth,
-      lt: endMonth,
+      gte: start,
+      lt: end,
     },
   }
-  // chart
-  const totalPostsCurrentBlogByMonth = Number(
-    await db.post.count({
-      where: {
-        ...where,
-      },
-    }),
-  )
-  // card
-  const totalUsersCurrentBlog = Number(
-    await db.blogUser.count({
-      where: {
-        blog_slug: blogSlug,
-      },
-    }),
-  )
-  // card
-  const totalPostsMadebyMeCurrentBlogByMonth = Number(
-    await db.post.count({
-      where: { user_id: userId, ...where },
-    }),
-  )
+  const totalPostsByMonth = await getTotalPosts(baseWhere)
 
-  const getTotalPostsPerCategory: TotalPostsPerCategory[] = (
-    await db.post.groupBy({
-      by: ['category'],
-      where: { user_id: userId, ...where },
-      _count: {
-        id: true,
-      },
-    })
-  ).map(({ category, _count }) => ({ category, totalPosts: _count.id }))
+  const totalUsers = await getTotalUsers(blogSlug)
+
+  const totalPostsMadeByUserByMonth = await getTotalPosts({
+    user_id: userId,
+    ...baseWhere,
+  })
+
+  const postsPerCategory = await getPostsPerCategory({
+    user_id: userId,
+    ...baseWhere,
+  })
 
   return {
-    totalPostsCurrentBlogByMonth,
-    totalUsersCurrentBlog,
-    totalPostsMadebyMeCurrentBlogByMonth,
-    getTotalPostsPerCategory,
+    totalPostsByMonth,
+    totalUsers,
+    totalPostsMadeByUserByMonth,
+    postsPerCategory,
   }
 }

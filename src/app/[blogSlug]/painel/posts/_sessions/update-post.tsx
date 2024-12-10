@@ -7,7 +7,6 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { Button } from '@/components/ui/button'
-
 import {
   FormField,
   FormItem,
@@ -32,10 +31,8 @@ import { Input } from '@/components/ui/input'
 
 import ReactQuill from 'react-quill'
 
-import { EditPostInput, EditPostSchema } from '@/schemas/Posts'
-import { updatePostOnBlog } from '../actions'
+import { updatePost } from '../actions'
 import { Pen } from 'lucide-react'
-import { PostCategory, Prisma } from '@prisma/client'
 import {
   Select,
   SelectContent,
@@ -43,7 +40,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { POST_CATEGORIES } from './create-post'
+
+import { toast } from 'sonner'
+import { PostCategory, Prisma } from '@prisma/client'
+import { POST_CATEGORIES } from '../contants'
+import { formatCategoryPost } from '@/lib/utils'
+import { EditPostInput, EditPostSchema } from '../schemas'
 
 type UpdatePostProps = {
   post: Pick<
@@ -65,34 +67,35 @@ export const UpdatePost = ({ post }: UpdatePostProps) => {
     },
   })
 
-  const onSubmit = form.handleSubmit(async (data) => {
-    const response = await updatePostOnBlog({ id: post.id, ...data })
-    if (response?.error) return console.error(response.error)
+  const isLoading = form.formState.isSubmitting
 
-    console.log('A publicação foi editada com sucesso!')
+  const handleFormSubmit = form.handleSubmit(async (data) => {
+    const response = await updatePost({ id: post.id as string, ...data })
+    if (response?.error) {
+      toast.error('Erro ao atualizar a publicação. Tente novamente.')
+      console.error(response.error)
+      return
+    }
+    toast.success('Publicação atualizada com sucesso!')
     setOpen(false)
   })
 
   useEffect(() => {
-    form.reset({
-      title: post.title as string,
-      subtitle: post.subtitle as string,
-      body: post.body as string,
-      category: post.category as PostCategory,
-    })
-  }, [post, form])
+    if (isOpen) {
+      form.reset({
+        title: post.title as string,
+        subtitle: post.subtitle as string,
+        body: post.body as string,
+        category: post.category as PostCategory,
+      })
+    }
+  }, [isOpen, post, form])
 
   return (
-    <Sheet
-      open={isOpen}
-      onOpenChange={(open) => {
-        setOpen(open)
-        if (!open) form.reset()
-      }}
-    >
+    <Sheet open={isOpen} onOpenChange={(open) => setOpen(open)}>
       <SheetTrigger asChild>
         <Button variant="outline" size="sm">
-          <Pen /> Editar
+          <Pen size={16} /> Editar
         </Button>
       </SheetTrigger>
 
@@ -100,22 +103,23 @@ export const UpdatePost = ({ post }: UpdatePostProps) => {
         <SheetHeader>
           <SheetTitle>Editar Publicação</SheetTitle>
           <SheetDescription>
-            Preencha o formulário para editar um publicação do blog
+            Preencha o formulário para editar uma publicação do blog.
           </SheetDescription>
         </SheetHeader>
 
         <Form {...form}>
-          <form className="space-y-4" onSubmit={onSubmit}>
+          <form className="space-y-4" onSubmit={handleFormSubmit}>
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Título</FormLabel>
+                  <FormLabel htmlFor="title">Título</FormLabel>
                   <FormControl>
                     <Input
+                      id="title"
                       placeholder="Título"
-                      disabled={form.formState.isSubmitting}
+                      disabled={isLoading}
                       {...field}
                     />
                   </FormControl>
@@ -129,11 +133,12 @@ export const UpdatePost = ({ post }: UpdatePostProps) => {
               name="subtitle"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Subtítulo</FormLabel>
+                  <FormLabel htmlFor="subtitle">Subtítulo</FormLabel>
                   <FormControl>
                     <Input
+                      id="subtitle"
                       placeholder="Subtítulo"
-                      disabled={form.formState.isSubmitting}
+                      disabled={isLoading}
                       {...field}
                     />
                   </FormControl>
@@ -147,26 +152,29 @@ export const UpdatePost = ({ post }: UpdatePostProps) => {
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Categoria</FormLabel>
+                  <FormLabel htmlFor="category">Categoria</FormLabel>
                   <Select
+                    value={field.value}
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
                     disabled={form.formState.isSubmitting}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger id="category">
                         <SelectValue placeholder="Selecione uma categoria" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="capitalize">
                       {POST_CATEGORIES.map((category) => (
-                        <SelectItem key={category.value} value={category.value}>
-                          {category.name}
+                        <SelectItem
+                          key={category}
+                          value={category}
+                          disabled={isLoading}
+                        >
+                          {formatCategoryPost(category)}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-
                   <FormMessage />
                 </FormItem>
               )}
@@ -177,13 +185,14 @@ export const UpdatePost = ({ post }: UpdatePostProps) => {
               name="body"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Conteúdo</FormLabel>
+                  <FormLabel htmlFor="body">Conteúdo</FormLabel>
                   <FormControl>
                     <ReactQuill
+                      id="body"
                       theme="snow"
                       value={field.value}
                       onChange={field.onChange}
-                      readOnly={form.formState.isSubmitting}
+                      readOnly={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -192,12 +201,15 @@ export const UpdatePost = ({ post }: UpdatePostProps) => {
             />
 
             <SheetFooter className="grid gap-3 sm:grid-cols-2 sm:gap-0">
-              <Button type="submit" className="w-full">
-                Salvar
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Salvando...' : 'Salvar'}
               </Button>
-
-              <SheetClose className="w-full" asChild>
-                <Button variant="outline" className="w-full">
+              <SheetClose asChild>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={isLoading}
+                >
                   Cancelar
                 </Button>
               </SheetClose>

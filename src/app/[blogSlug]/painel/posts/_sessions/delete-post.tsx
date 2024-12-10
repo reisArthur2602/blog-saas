@@ -11,13 +11,17 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
-import { deletePostOnBlog } from '../actions'
+import { deletePost } from '../actions'
+import { toast } from 'sonner'
 
 export const DeletePost = ({ id }: { id: string }) => {
   const onDelete = async () => {
-    const response = await deletePostOnBlog({ id })
-    if (response?.error) return console.error(response.error)
+    const response = await deletePost({ id })
+    if (response?.error) {
+      toast.error(response.error)
+    }
   }
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>

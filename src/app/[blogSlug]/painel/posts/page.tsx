@@ -1,9 +1,10 @@
 import { Header, HeaderTitle } from '@/components/ui/header'
 import { CreatePost } from './_sessions/create-post'
 import { PostsTable } from './_sessions/posts-table'
-import { getPostsCurrentBlog } from './actions'
+
 import { PostFilters } from './_sessions/post-filters'
 import { PostCategory } from '@prisma/client'
+import { getPostsForBlog } from './actions'
 
 type Props = {
   params: { blogSlug: string }
@@ -11,7 +12,7 @@ type Props = {
 }
 
 const Page = async ({ params: { blogSlug }, searchParams }: Props) => {
-  const postsData = await getPostsCurrentBlog({
+  const posts = await getPostsForBlog({
     blogSlug,
     filters: searchParams,
   })
@@ -31,7 +32,7 @@ const Page = async ({ params: { blogSlug }, searchParams }: Props) => {
           </p>
         </div>
         <PostFilters blogSlug={blogSlug} />
-        <PostsTable data={postsData} />
+        <PostsTable data={posts} />
       </div>
     </div>
   )

@@ -1,16 +1,13 @@
-'use client'
-
 import { Badge } from '@/components/ui/badge'
-import { DataTable } from '@/components/ui/data-table'
-import { formatDate, formatRole } from '@/lib/utils'
-import { UserRole } from '@prisma/client'
+import { Button } from '@/components/ui/button'
 import { ColumnDef } from '@tanstack/react-table'
+import { UserRole } from '@prisma/client'
+import { formatDate, formatRole } from '@/lib/utils'
 import { EditBlogUser } from './edit-blog-user'
 import { DeleteBlogUser } from './delete-blog-user'
-import { Button } from '@/components/ui/button'
 import { Search } from 'lucide-react'
 
-type UserColumn = {
+export type UsersColumn = {
   id: string
   role: UserRole
   blog_slug: string
@@ -22,12 +19,12 @@ type UserColumn = {
   }
 }
 
-export const columns: ColumnDef<UserColumn>[] = [
+export const usersColumns: ColumnDef<UsersColumn>[] = [
   {
     accessorKey: 'details',
     header: '',
     cell: () => (
-      <Button variant={`outline`} size={`icon`}>
+      <Button variant="outline" size="icon" aria-label="Ver Detalhes">
         <Search size={16} />
       </Button>
     ),
@@ -35,14 +32,11 @@ export const columns: ColumnDef<UserColumn>[] = [
   {
     accessorKey: 'user.name',
     header: 'Nome',
-    cell: ({ row }) => <span>{row.original.user.name}</span>,
   },
   {
     accessorKey: 'user.email',
     header: 'Email',
-    cell: ({ row }) => <span>{row.original.user.email} </span>,
   },
-
   {
     accessorKey: 'role',
     header: 'Cargo',
@@ -57,23 +51,16 @@ export const columns: ColumnDef<UserColumn>[] = [
   },
   {
     id: 'actions',
+    header: 'Ações',
     cell: ({
       row: {
-        original: {
-          id,
-          role,
-          user: { email },
-        },
+        original: { id, role },
       },
     }) => (
       <div className="flex gap-4">
-        <EditBlogUser email={email} id={id} role={role} />
+        <EditBlogUser id={id} role={role} />
         <DeleteBlogUser id={id} />
       </div>
     ),
   },
 ]
-
-export const BlogUsersTable = ({ data }: { data: UserColumn[] }) => {
-  return <DataTable columns={columns} data={data} />
-}

@@ -12,30 +12,34 @@ type Filters = {
   category?: PostCategory
 }
 
-export const createPostOnBlog = async ({
-  subtitle,
-  title,
-  body,
-  category,
-  blog_slug: blogSlug,
-}: Prisma.PostUncheckedCreateWithoutUserInput) => {
+type CreatePostInput = Prisma.PostUncheckedCreateWithoutUserInput
+
+type UpdatePostInput = Prisma.PostUpdateInput
+
+const revalidatePostsPath = (blogSlug: string) => {
+  revalidatePath(`/${blogSlug}/painel/posts`)
+}
+
+export const createPost = async (input: CreatePostInput) => {
   const currentUser = await auth()
+
+  const { subtitle, title, body, category, blog_slug: slug } = input
 
   await db.post.create({
     data: {
       subtitle,
-      category,
       title,
       body,
-      blog_slug: blogSlug,
+      category,
+      blog_slug: slug,
       user_id: currentUser!.id,
     },
   })
 
-  revalidatePath(`/${blogSlug}/painel/posts`)
+  revalidatePostsPath(slug)
 }
 
-export const getPostsCurrentBlog = async ({
+export const getPostsForBlog = async ({
   blogSlug,
   filters,
 }: {
@@ -44,21 +48,23 @@ export const getPostsCurrentBlog = async ({
 }) => {
   const currentUser = await auth()
 
-  const currentUserIsAuthor = await hasPermissionServerSide({
+  const isAuthor = await hasPermissionServerSide({
     role: 'AUTHOR',
     blogSlug,
     userId: currentUser!.id,
   })
 
-  const currentUserPosts = await db.post.findMany({
-    where: {
-      blog_slug: blogSlug,
-      user_id: currentUserIsAuthor ? currentUser!.id : undefined,
-      user: filters.name
-        ? { name: { contains: filters.name, mode: 'insensitive' } }
-        : undefined,
-      category: filters.category ?? undefined,
-    },
+  const postFilters: Prisma.PostWhereInput = {
+    blog_slug: blogSlug,
+    user_id: isAuthor ? currentUser!.id : undefined,
+    user: filters.name
+      ? { name: { contains: filters.name, mode: 'insensitive' } }
+      : undefined,
+    category: filters.category ?? undefined,
+  }
+
+  return await db.post.findMany({
+    where: postFilters,
     select: {
       id: true,
       title: true,
@@ -70,41 +76,33 @@ export const getPostsCurrentBlog = async ({
     },
     orderBy: { created_at: 'asc' },
   })
-
-  return currentUserPosts
 }
 
-export const updatePostOnBlog = async ({
-  id,
-  title,
-  body,
-  subtitle,
-  category,
-}: Prisma.PostUpdateInput) => {
+export const updatePost = async (input: UpdatePostInput & { id: string }) => {
+  const { id, title, body, subtitle, category } = input
+
   try {
-    const post = await db.post.update({
-      where: { id: id as string },
-      data: {
-        title,
-        body,
-        subtitle,
-        category,
-      },
+    const updatedPost = await db.post.update({
+      where: { id },
+      data: { title, body, subtitle, category },
     })
-    revalidatePath(`/${post.blog_slug}/painel/posts`)
+
+    revalidatePostsPath(updatedPost.blog_slug)
   } catch {
-    return { error: 'O post não foi encontrado' }
+    return { error: 'O post não foi encontrado.' }
   }
 }
 
-export const deletePostOnBlog = async ({ id }: { id: string }) => {
+export const deletePost = async ({ id }: { id: string }) => {
   try {
-    const { blog_slug: blogSlug } = await db.post.delete({ where: { id } })
+    const deletedPost = await db.post.delete({
+      where: { id },
+    })
 
-    revalidatePath(`/${blogSlug}/painel/posts`)
+    revalidatePostsPath(deletedPost.blog_slug)
   } catch {
-    return { error: 'A publicação não foi encontrada' }
+    return { error: 'A publicação não foi encontrada.' }
   }
 }
 
-export type PostsData = ReturnTypeWithoutPromise<typeof getPostsCurrentBlog>
+export type PostsData = ReturnTypeWithoutPromise<typeof getPostsForBlog>

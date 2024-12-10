@@ -17,7 +17,8 @@ import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { Filter, X } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { POST_CATEGORIES } from './create-post'
+import { POST_CATEGORIES } from '../contants'
+import { formatCategoryPost } from '@/lib/utils'
 
 const PostsFiltersSchema = z.object({
   name: z.string().optional(),
@@ -27,11 +28,10 @@ const PostsFiltersSchema = z.object({
 type PostsFiltersInput = z.infer<typeof PostsFiltersSchema>
 
 export const PostFilters = ({ blogSlug }: { blogSlug: string }) => {
+  const { replace } = useRouter()
   const searchParams = useSearchParams()
   const name = searchParams.get('name') ?? ''
   const category = searchParams.get('category') ?? ''
-
-  const { push } = useRouter()
 
   const form = useForm<PostsFiltersInput>({
     resolver: zodResolver(PostsFiltersSchema),
@@ -41,25 +41,27 @@ export const PostFilters = ({ blogSlug }: { blogSlug: string }) => {
     },
   })
 
-  const onFilter = form.handleSubmit((data) => {
+  const isLoading = form.formState.isSubmitting
+
+  const onFilter = (data: PostsFiltersInput) => {
     const params = new URLSearchParams()
 
     if (data.name) params.set('name', data.name)
     if (data.category) params.set('category', data.category)
 
-    push(`/${blogSlug}/painel/posts?${params.toString()}`)
-  })
+    replace(`/${blogSlug}/painel/posts?${params.toString()}`, { scroll: false })
+  }
 
   const onClearFilters = () => {
     form.reset()
-    push(`/${blogSlug}/painel/posts`)
+    replace(`/${blogSlug}/painel/posts`, { scroll: false })
   }
 
   return (
     <Form {...form}>
       <form
         className="w-full flex items-center justify-between"
-        onSubmit={onFilter}
+        onSubmit={form.handleSubmit(onFilter)}
       >
         <div className="grid grid-cols-[300px_280px] gap-2 ">
           <FormField
@@ -70,7 +72,7 @@ export const PostFilters = ({ blogSlug }: { blogSlug: string }) => {
                 <FormControl>
                   <Input
                     placeholder="Buscar por autor"
-                    disabled={form.formState.isSubmitting}
+                    disabled={isLoading}
                     {...field}
                   />
                 </FormControl>
@@ -90,9 +92,13 @@ export const PostFilters = ({ blogSlug }: { blogSlug: string }) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="capitalize truncate">
-                    {POST_CATEGORIES.map(({ value, name }) => (
-                      <SelectItem key={value} value={value}>
-                        {name}
+                    {POST_CATEGORIES.map((category) => (
+                      <SelectItem
+                        key={category}
+                        value={category}
+                        disabled={isLoading}
+                      >
+                        {formatCategoryPost(category)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -109,6 +115,7 @@ export const PostFilters = ({ blogSlug }: { blogSlug: string }) => {
             type="button"
             onClick={onClearFilters}
             size={'sm'}
+            disabled={isLoading}
           >
             <X />
             <span>Remover Filtros</span>
@@ -118,6 +125,7 @@ export const PostFilters = ({ blogSlug }: { blogSlug: string }) => {
             variant="secondary"
             className="w-fit"
             size={'sm'}
+            disabled={isLoading}
           >
             <Filter />
             <span>Filtrar Resultados</span>

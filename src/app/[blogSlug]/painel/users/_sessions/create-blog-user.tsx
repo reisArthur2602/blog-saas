@@ -32,18 +32,14 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-import { UserRole } from '@prisma/client'
-import { createBlogUser } from '../actions'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { formatRole } from '@/lib/utils'
-import { BlogUserInput, CreateBlogUserSchema } from '@/schemas/BlogUser'
 
-export const USER_ROLES: { role: UserRole }[] = [
-  { role: 'AUTHOR' },
-  { role: 'EDITOR' },
-  { role: 'OWNER' },
-]
+import { toast } from 'sonner'
+import { createBlogUser } from '../actions'
+import { USER_ROLES } from '../constants'
+import { BlogUserInput, CreateBlogUserSchema } from '../schemas'
 
 export const CreateBlogUser = ({ slug }: { slug: string }) => {
   const [isOpen, setOpen] = useState(false)
@@ -52,19 +48,18 @@ export const CreateBlogUser = ({ slug }: { slug: string }) => {
     resolver: zodResolver(CreateBlogUserSchema),
     defaultValues: {
       email: '',
-      role: UserRole.AUTHOR,
+      role: 'AUTHOR',
     },
   })
 
-  const onSubmit = form.handleSubmit(async (data) => {
-    const response = await createBlogUser({ ...data, blogSlug: slug })
+  const isLoading = form.formState.isSubmitting
 
-    if (response?.error) return console.error(response.error)
-
-    console.log('Usuário adicionado com sucesso!')
+  const onSubmit = async (data: BlogUserInput) => {
+    await createBlogUser({ ...data, blogSlug: slug })
+    toast.success('Usuário adicionado com sucesso!')
     form.reset()
     setOpen(!open)
-  })
+  }
 
   return (
     <Sheet
@@ -89,7 +84,7 @@ export const CreateBlogUser = ({ slug }: { slug: string }) => {
         </SheetHeader>
 
         <Form {...form}>
-          <form className="space-y-4" onSubmit={onSubmit}>
+          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
               control={form.control}
               name="email"
@@ -99,7 +94,7 @@ export const CreateBlogUser = ({ slug }: { slug: string }) => {
                   <FormControl>
                     <Input
                       placeholder="Email"
-                      disabled={form.formState.isSubmitting}
+                      disabled={isLoading}
                       {...field}
                     />
                   </FormControl>
@@ -124,8 +119,12 @@ export const CreateBlogUser = ({ slug }: { slug: string }) => {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent className="capitalize">
-                      {USER_ROLES.map(({ role }) => (
-                        <SelectItem key={role} value={role}>
+                      {USER_ROLES.map((role) => (
+                        <SelectItem
+                          key={role}
+                          value={role}
+                          disabled={isLoading}
+                        >
                           {formatRole(role)}
                         </SelectItem>
                       ))}
@@ -138,10 +137,16 @@ export const CreateBlogUser = ({ slug }: { slug: string }) => {
             />
 
             <SheetFooter className="grid gap-3 sm:grid-cols-2 sm:gap-0">
-              <Button>Salvar</Button>
+              <Button disabled={isLoading}>
+                {isLoading ? 'Salvando... ' : 'Salvar'}
+              </Button>
 
               <SheetClose className="w-full" asChild>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  disabled={isLoading}
+                >
                   Cancelar
                 </Button>
               </SheetClose>

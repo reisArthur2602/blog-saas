@@ -1,5 +1,9 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -10,57 +14,36 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-
+import { Textarea } from '@/components/ui/textarea'
 import {
+  Sheet,
   SheetTrigger,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetFooter,
   SheetClose,
-  Sheet,
   SheetDescription,
 } from '@/components/ui/sheet'
-import { Textarea } from '@/components/ui/textarea'
 
 import { Plus, Zap } from 'lucide-react'
 
-import { useForm } from 'react-hook-form'
-
-import { zodResolver } from '@hookform/resolvers/zod'
-import { BlogInput, CreateBlogSchema } from '@/schemas/Blog'
-
 import { createBlog } from '../actions'
-
 import { sendPromptToGemini } from '@/lib/gemini'
-import { useEffect, useState } from 'react'
+import { BlogInput, CreateBlogSchema } from '../schemas'
 
 type GeminiResult = {
   name: string
   slug: string
   description: string
 }
-export const CreateBlog = () => {
-  const [isOpen, setOpen] = useState(false)
-  const [isLoadingGemini, setLoadingGemini] = useState(false)
-  const [geminiResult, setGeminiResult] = useState<GeminiResult | null>(null)
 
-  const handleGenerate = async () => {
-    setLoadingGemini(true)
-    await sendPromptToGemini({
-      prompt: `
-                Escreva um blog sobre qualquer tema de sua escolha. Crie sempre algo diferente e não repita, porém responda no formato JSON.
-                Siga esse exemplo e respeite as regras abaixo:
-                {
-                    "name": "Título do blog (max. 60 caracteres)",
-                    "description": "Descrição do blog (max. 191 caracteres)",
-                    "slug": "Slug do blog (max. 191 caracteres, siga o regex: /^[a-z0-9]+(?:-[a-z0-9]+)*$/)" 
-                }
-            `,
-    })
-      .then((result) => setGeminiResult(result))
-      .finally(() => setLoadingGemini(false))
-  }
+export const CreateBlog = () => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [isLoadingAI, setIsLoadingAI] = useState(false)
+  const [aiGeneratedBlog, setAIGeneratedBlog] = useState<GeminiResult | null>(
+    null,
+  )
 
   const form = useForm<BlogInput>({
     resolver: zodResolver(CreateBlogSchema),
@@ -73,29 +56,58 @@ export const CreateBlog = () => {
     },
   })
 
-  const onSubmit = form.handleSubmit(async (data) => {
-    const response = await createBlog(data)
-    if (response?.error) return console.error(response.error)
-    console.log('Blog cadastrado com sucesso')
-    form.reset()
-    setOpen(!isOpen)
-  })
+  const isSubmitting = form.formState.isSubmitting
+
+  const isDisabled = isSubmitting || isLoadingAI
+
+  const handleGenerateAI = async () => {
+    setIsLoadingAI(true)
+    try {
+      const result = await sendPromptToGemini({
+        prompt: `
+          Escreva um blog sobre qualquer tema de sua escolha. Crie sempre algo diferente e não repita, porém responda no formato JSON.
+          Siga esse exemplo e respeite as regras abaixo:
+          {
+            "name": "Título do blog (max. 60 caracteres)",
+            "description": "Descrição do blog (max. 191 caracteres)",
+            "slug": "Slug do blog (max. 191 caracteres, siga o regex: /^[a-z0-9]+(?:-[a-z0-9]+)*$/)" 
+          }
+        `,
+      })
+      setAIGeneratedBlog(result)
+    } finally {
+      setIsLoadingAI(false)
+    }
+  }
 
   useEffect(() => {
-    form.reset({
-      slug: geminiResult?.slug,
-      description: geminiResult?.description,
-      name: geminiResult?.name,
-      secondColor: '#000000',
-      mainColor: '#FFFFFF',
-    })
-  }, [geminiResult, form])
+    if (aiGeneratedBlog) {
+      form.reset({
+        slug: aiGeneratedBlog.slug,
+        description: aiGeneratedBlog.description,
+        name: aiGeneratedBlog.name,
+        secondColor: '#000000',
+        mainColor: '#FFFFFF',
+      })
+    }
+  }, [aiGeneratedBlog, form])
+
+  const onSubmit = form.handleSubmit(async (data) => {
+    const response = await createBlog(data)
+    if (response?.error) {
+      console.error(response.error)
+      return
+    }
+    console.log('Blog cadastrado com sucesso')
+    form.reset()
+    setIsOpen(false)
+  })
 
   return (
     <Sheet
       open={isOpen}
       onOpenChange={(open) => {
-        setOpen(open)
+        setIsOpen(open)
         if (!open) form.reset()
       }}
     >
@@ -111,14 +123,11 @@ export const CreateBlog = () => {
           <SheetDescription>
             Preencha o formulário para criar um blog
           </SheetDescription>
-          <Button
-            size={'sm'}
-            onClick={() => handleGenerate()}
-            disabled={form.formState.isSubmitting || isLoadingGemini}
-          >
-            <Zap /> {isLoadingGemini ? 'Gerando blog...' : 'Gerar com IA'}
+          <Button size="sm" onClick={handleGenerateAI} disabled={isDisabled}>
+            <Zap /> {isLoadingAI ? 'Gerando blog...' : 'Gerar com IA'}
           </Button>
         </SheetHeader>
+
         <Form {...form}>
           <form className="space-y-4" onSubmit={onSubmit}>
             <FormField
@@ -130,15 +139,14 @@ export const CreateBlog = () => {
                   <FormControl>
                     <Input
                       placeholder="Nome"
-                      disabled={form.formState.isSubmitting || isLoadingGemini}
                       {...field}
+                      disabled={isDisabled}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="slug"
@@ -148,8 +156,8 @@ export const CreateBlog = () => {
                   <FormControl>
                     <Input
                       placeholder="ex: meu-blog"
-                      disabled={form.formState.isSubmitting || isLoadingGemini}
                       {...field}
+                      disabled={isDisabled}
                     />
                   </FormControl>
                   <FormMessage />
@@ -165,9 +173,9 @@ export const CreateBlog = () => {
                   <FormControl>
                     <Textarea
                       placeholder="Descrição"
-                      disabled={form.formState.isSubmitting || isLoadingGemini}
-                      style={{ resize: 'none', height: '120px' }}
                       {...field}
+                      disabled={isDisabled}
+                      style={{ resize: 'none', height: '120px' }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -181,11 +189,7 @@ export const CreateBlog = () => {
                 <FormItem>
                   <FormLabel>Cor Principal</FormLabel>
                   <FormControl>
-                    <Input
-                      disabled={form.formState.isSubmitting || isLoadingGemini}
-                      type="color"
-                      {...field}
-                    />
+                    <Input type="color" {...field} disabled={isDisabled} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -198,26 +202,21 @@ export const CreateBlog = () => {
                 <FormItem>
                   <FormLabel>Cor Secundária</FormLabel>
                   <FormControl>
-                    <Input
-                      disabled={form.formState.isSubmitting || isLoadingGemini}
-                      type="color"
-                      {...field}
-                    />
+                    <Input type="color" {...field} disabled={isDisabled} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <SheetFooter className="grid gap-3 sm:grid-cols-2 sm:gap-0">
-              <Button disabled={form.formState.isSubmitting || isLoadingGemini}>
+              <Button type="submit" disabled={isDisabled}>
                 Salvar
               </Button>
-
-              <SheetClose className="w-full" asChild>
+              <SheetClose asChild>
                 <Button
                   variant="outline"
                   className="w-full"
-                  disabled={form.formState.isSubmitting || isLoadingGemini}
+                  disabled={isDisabled}
                 >
                   Cancelar
                 </Button>

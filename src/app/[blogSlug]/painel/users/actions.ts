@@ -1,29 +1,65 @@
 'use server'
 
 import { db } from '@/lib/prisma'
-import { UserRole } from '@prisma/client'
+import { Prisma, UserRole } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
+
+const ERROR_MESSAGES = {
+  USER_NOT_FOUND: 'Usuário não encontrado',
+  BLOG_USER_NOT_FOUND: 'Usuário do blog não encontrado ',
+}
 
 type Filters = {
   name?: string
   role?: UserRole
 }
 
-export const getBlogsUsersCurrentBlog = async ({
+const revalidateUsersPath = (blogSlug: string) =>
+  revalidatePath(`/${blogSlug}/painel/users`)
+
+export const createBlogUser = async ({
+  email,
+  blogSlug,
+  role,
+}: {
+  email: string
+  blogSlug: string
+  role: UserRole
+}) => {
+  const existingUser = await db.user.findUnique({ where: { email } })
+
+  if (!existingUser) {
+    return { error: ERROR_MESSAGES.USER_NOT_FOUND }
+  }
+
+  await db.blogUser.create({
+    data: {
+      blog_slug: blogSlug,
+      user_id: existingUser.id,
+      role,
+    },
+  })
+
+  revalidateUsersPath(`/${blogSlug}/painel/users`)
+}
+
+export const getUsersForBlog = async ({
   slug,
   filters,
 }: {
   slug: string
   filters: Filters
 }) => {
-  const blogsUsers = await db.blogUser.findMany({
-    where: {
-      blog_slug: slug,
-      user: filters.name
-        ? { name: { contains: filters.name, mode: 'insensitive' } }
-        : undefined,
-      role: filters.role ?? undefined,
-    },
+  const blogUserFilters: Prisma.BlogUserWhereInput = {
+    blog_slug: slug,
+    user: filters.name
+      ? { name: { contains: filters.name, mode: 'insensitive' } }
+      : undefined,
+    role: filters.role ?? undefined,
+  }
+
+  return await db.blogUser.findMany({
+    where: blogUserFilters,
     select: {
       id: true,
       role: true,
@@ -31,33 +67,8 @@ export const getBlogsUsersCurrentBlog = async ({
       created_at: true,
       user: { select: { id: true, email: true, name: true } },
     },
+    orderBy: { created_at: 'asc' },
   })
-
-  return blogsUsers
-}
-
-export const createBlogUser = async ({
-  blogSlug,
-  email,
-  role,
-}: {
-  email: string
-  blogSlug: string
-  role: UserRole
-}) => {
-  const user = await db.user.findUnique({ where: { email } })
-
-  if (!user) return { error: 'O usuário não foi encontrado' }
-
-  await db.blogUser.create({
-    data: {
-      blog_slug: blogSlug,
-      user_id: user.id,
-      role,
-    },
-  })
-
-  revalidatePath(`/${blogSlug}/painel/users`)
 }
 
 export const editBlogUser = async ({
@@ -67,24 +78,25 @@ export const editBlogUser = async ({
   id: string
   role: UserRole
 }) => {
-  const currentBlogUser = await db.blogUser.findUnique({ where: { id } })
+  const blogUser = await db.blogUser.findUnique({ where: { id } })
 
-  if (!currentBlogUser) return { error: 'Erro ao atualizar permissão' }
+  if (!blogUser) {
+    return { error: ERROR_MESSAGES.BLOG_USER_NOT_FOUND }
+  }
 
   await db.blogUser.update({
-    where: { id: currentBlogUser?.id },
+    where: { id },
     data: { role },
   })
 
-  revalidatePath(`/${currentBlogUser?.blog_slug}/painel/users`)
+  revalidateUsersPath(`/${blogUser.blog_slug}/painel/users`)
 }
 
 export const deleteBlogUser = async ({ id }: { id: string }) => {
   try {
-    const { blog_slug: blogSlug } = await db.blogUser.delete({ where: { id } })
-
-    revalidatePath(`/${blogSlug}/painel/users`)
+    const deletedBlogUser = await db.blogUser.delete({ where: { id } })
+    revalidateUsersPath(`/${deletedBlogUser.blog_slug}/painel/users`)
   } catch {
-    return { error: 'o usuário não foi encontrado' }
+    return { error: 'Erro ao remover o usuário. Ele pode não existir.' }
   }
 }

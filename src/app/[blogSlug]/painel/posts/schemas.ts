@@ -29,4 +29,5 @@ export const EditPostSchema = z.object({
 })
 
 export type PostInput = z.infer<typeof CreatePostSchema>
+
 export type EditPostInput = z.infer<typeof EditPostSchema>

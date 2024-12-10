@@ -13,28 +13,22 @@ import { formatRole } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { USER_ROLES } from './create-blog-user'
+
 import { Button } from '@/components/ui/button'
 import { Filter, X } from 'lucide-react'
 import { useRouter, useSearchParams } from 'next/navigation'
-
-const UsersFiltersSchema = z.object({
-  name: z.string().optional(),
-  role: z.string().optional(),
-})
-
-type UsersFiltersInput = z.infer<typeof UsersFiltersSchema>
+import { BlogUserFiltersInput, BlogUserFiltersSchema } from '../schemas'
+import { USER_ROLES } from '../constants'
 
 export const UsersFilters = ({ blogSlug }: { blogSlug: string }) => {
   const searchParams = useSearchParams()
   const name = searchParams.get('name') ?? ''
   const role = searchParams.get('role') ?? ''
 
-  const { push } = useRouter()
+  const { replace } = useRouter()
 
-  const form = useForm<UsersFiltersInput>({
-    resolver: zodResolver(UsersFiltersSchema),
+  const form = useForm<BlogUserFiltersInput>({
+    resolver: zodResolver(BlogUserFiltersSchema),
     defaultValues: {
       name,
       role,
@@ -47,12 +41,12 @@ export const UsersFilters = ({ blogSlug }: { blogSlug: string }) => {
     if (data.name) params.set('name', data.name)
     if (data.role) params.set('role', data.role)
 
-    push(`/${blogSlug}/painel/users?${params.toString()}`)
+    replace(`/${blogSlug}/painel/users?${params.toString()}`, { scroll: false })
   })
 
   const onClearFilters = () => {
     form.reset()
-    push(`/${blogSlug}/painel/users`)
+    replace(`/${blogSlug}/painel/users`, { scroll: false })
   }
 
   return (
@@ -90,7 +84,7 @@ export const UsersFilters = ({ blogSlug }: { blogSlug: string }) => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="capitalize">
-                    {USER_ROLES.map(({ role }) => (
+                    {USER_ROLES.map((role) => (
                       <SelectItem key={role} value={role}>
                         {formatRole(role)}
                       </SelectItem>

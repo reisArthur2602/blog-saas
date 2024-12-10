@@ -12,12 +12,14 @@ import {
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
 import { deleteBlogUser } from '../actions'
+import { toast } from 'sonner'
 
 export const DeleteBlogUser = ({ id }: { id: string }) => {
   const onDelete = async () => {
     const response = await deleteBlogUser({ id })
-    if (response?.error) return console.error(response.error)
+    if (response?.error) return toast.error(response.error)
   }
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>

@@ -1,7 +1,6 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
-
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   SheetTrigger,
@@ -14,7 +13,6 @@ import {
   Sheet,
 } from '@/components/ui/sheet'
 
-import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -24,93 +22,119 @@ import {
 } from '@/components/ui/select'
 
 import { UserRole } from '@prisma/client'
-
 import { formatRole } from '@/lib/utils'
 import { editBlogUser } from '../actions'
 import { Pen } from 'lucide-react'
-import { Label } from '@/components/ui/label'
+import { toast } from 'sonner'
+import { USER_ROLES } from '../constants'
+import { useForm } from 'react-hook-form'
+import { EditBlogUserInput, EditBlogUserSchema } from '../schemas'
+import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from '@/components/ui/form'
 
-const USER_ROLES: { role: UserRole }[] = [
-  { role: 'AUTHOR' },
-  { role: 'EDITOR' },
-  { role: 'OWNER' },
-]
-
-export const EditBlogUser = ({
-  id,
-  email,
-  role,
-}: {
+type EditBlogUserProps = {
   id: string
-  email: string
-  role: UserRole
-}) => {
+  currentRole: UserRole
+}
+
+export const EditBlogUser = ({ id, currentRole }: EditBlogUserProps) => {
   const [isOpen, setOpen] = useState(false)
-  const [selectedRole, setRole] = useState<UserRole>('AUTHOR')
 
-  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const form = useForm<EditBlogUserInput>({
+    resolver: zodResolver(EditBlogUserSchema),
+    defaultValues: {
+      role: currentRole ?? 'AUTHOR',
+    },
+  })
 
-    const response = await editBlogUser({ id, role: selectedRole })
-    if (response?.error) return console.error(response.error)
+  const isLoading = form.formState.isSubmitting
 
-    console.log('A permissão do usuário foi atualizada com sucesso!')
-    setOpen(!open)
+  const onSubmit = async (data: EditBlogUserInput) => {
+    const response = await editBlogUser({
+      id,
+      role: data.role,
+    })
+
+    if (response?.error) {
+      toast.error(response.error)
+      return
+    }
+
+    setOpen(false)
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => setOpen(open)}>
+    <Sheet
+      open={isOpen}
+      onOpenChange={(open) => {
+        setOpen(open)
+        if (!open) form.reset()
+      }}
+    >
       <SheetTrigger asChild>
         <Button variant="outline" size="sm">
-          <Pen /> Editar
+          <Pen size={16} /> Editar
         </Button>
       </SheetTrigger>
 
       <SheetContent className="space-y-6 overflow-y-auto w-full">
         <SheetHeader>
-          <SheetTitle>Editar cargo</SheetTitle>
+          <SheetTitle>Editar Cargo</SheetTitle>
           <SheetDescription>
-            Preencha o formulário para editar o cargo do usuário no blog.
+            Altere o cargo do usuário preenchendo os campos abaixo.
           </SheetDescription>
         </SheetHeader>
+        <Form {...form}>
+          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cargo</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione uma permissão" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="capitalize">
+                      {USER_ROLES.map((role) => (
+                        <SelectItem
+                          key={role}
+                          value={role}
+                          disabled={isLoading}
+                        >
+                          {formatRole(role)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
 
-        <form className="space-y-4" onSubmit={onSubmit}>
-          <div className="space-y-2">
-            <Label>Email</Label>
-            <Input placeholder="Email" disabled={true} defaultValue={email} />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Cargo</Label>
-
-            <Select
-              onValueChange={(e) => setRole(e as UserRole)}
-              defaultValue={role || selectedRole}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Selecione uma permissão" />
-              </SelectTrigger>
-
-              <SelectContent className="capitalize">
-                {USER_ROLES.map(({ role }) => (
-                  <SelectItem key={role} value={role}>
-                    {formatRole(role)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <SheetFooter className="grid gap-3 sm:grid-cols-2 sm:gap-0">
-            <Button>Salvar</Button>
-
-            <SheetClose className="w-full" asChild>
-              <Button variant="outline" className="w-full">
-                Cancelar
+            <SheetFooter className="grid gap-3 sm:grid-cols-2 sm:gap-0">
+              <Button disabled={isLoading}>
+                {isLoading ? 'Salvando...' : 'Salvar'}
               </Button>
-            </SheetClose>
-          </SheetFooter>
-        </form>
+              <SheetClose asChild>
+                <Button variant="outline" disabled={isLoading}>
+                  Cancelar
+                </Button>
+              </SheetClose>
+            </SheetFooter>
+          </form>
+        </Form>
       </SheetContent>
     </Sheet>
   )

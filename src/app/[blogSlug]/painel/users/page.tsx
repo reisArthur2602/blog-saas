@@ -1,10 +1,10 @@
 import { Header, HeaderTitle } from '@/components/ui/header'
-import { getBlogsUsersCurrentBlog } from './actions'
 
 import { CreateBlogUser } from './_sessions/create-blog-user'
-import { BlogUsersTable } from './_sessions/blog-users-table'
+import { BlogUsersTable } from './_sessions/users-table'
 import { UsersFilters } from './_sessions/users-filters'
 import { UserRole } from '@prisma/client'
+import { getUsersForBlog } from './actions'
 
 type Props = {
   params: {
@@ -16,15 +16,10 @@ type Props = {
   }
 }
 
-const Page = async ({
-  params: { blogSlug },
-  searchParams: { name, role },
-}: Props) => {
-  const filtersParams = { name, role }
-
-  const blogsUsersCurrentBlog = await getBlogsUsersCurrentBlog({
+const Page = async ({ params: { blogSlug }, searchParams }: Props) => {
+  const blogUsers = await getUsersForBlog({
     slug: blogSlug,
-    filters: filtersParams,
+    filters: searchParams,
   })
 
   return (
@@ -42,7 +37,7 @@ const Page = async ({
         </div>
         <UsersFilters blogSlug={blogSlug} />
 
-        <BlogUsersTable data={blogsUsersCurrentBlog} />
+        <BlogUsersTable data={blogUsers} />
       </div>
     </div>
   )

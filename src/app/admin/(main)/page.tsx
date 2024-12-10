@@ -1,8 +1,8 @@
 import { AdminBlogs } from './_sessions/admin-blog'
-import { getBlogsForLoggedUser } from './actions'
+import { getBlogs } from './actions'
 
 const Page = async () => {
-  const blogs = await getBlogsForLoggedUser()
+  const blogs = await getBlogs()
 
   return <AdminBlogs blogs={blogs} />
 }
