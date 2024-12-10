@@ -10,8 +10,8 @@ export const UpsertBlogSchema = z.object({
     .min(1, { message: 'O slug é obrigatório' })
     .max(60, { message: 'Deve ter no máximo 60 caracteres' }),
   description: z.string().optional(),
-  mainColor: z.string(),
-  secondColor: z.string(),
+  mainColor: z.string().optional(),
+  secondColor: z.string().optional(),
 })
 
 export type BlogInput = z.infer<typeof UpsertBlogSchema>

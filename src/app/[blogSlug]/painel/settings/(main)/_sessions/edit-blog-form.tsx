@@ -1,7 +1,7 @@
 'use client'
 
 import { useForm } from 'react-hook-form'
-import { SettingsBlog } from '../actions'
+import { SettingsBlog, updateBlog, UpdateBlogInput } from '../actions'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -16,6 +16,8 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { BlogInput, UpsertBlogSchema } from '@/app/admin/(main)/schemas'
+import { toast } from 'sonner'
+import { useEffect } from 'react'
 
 const EditBlogForm = ({ settings }: { settings: SettingsBlog }) => {
   const form = useForm<BlogInput>({
@@ -31,10 +33,24 @@ const EditBlogForm = ({ settings }: { settings: SettingsBlog }) => {
 
   const isLoading = form.formState.isSubmitting
 
+  const onSubmit = async (data: BlogInput) => {
+    await updateBlog(data as UpdateBlogInput)
+    toast.success('As configurações do blog foram alteradas com sucesso')
+  }
+
+  useEffect(() => {
+    form.reset({
+      description: settings?.description ?? '',
+      name: settings?.name ?? '',
+      secondColor: settings?.secondColor ?? '#000000',
+      mainColor: settings?.mainColor ?? '#FFFFFF',
+    })
+  }, [settings, form])
+
   return (
     <>
       <Form {...form}>
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="grid grid-cols-2 gap-4 ">
             <FormField
               control={form.control}
@@ -58,8 +74,8 @@ const EditBlogForm = ({ settings }: { settings: SettingsBlog }) => {
                   <FormControl>
                     <Input
                       placeholder="ex: meu-blog"
+                      disabled={true}
                       {...field}
-                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
