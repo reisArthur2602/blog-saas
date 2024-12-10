@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 
-import { getDataBlogFromSlug } from './actions'
+import { getBlogFromSlug } from './actions'
 import { BlogSidebar } from './_sessions/blog-sidebar'
 import { auth } from '@/lib/auth'
 
@@ -17,20 +17,20 @@ const BlogLayout = async ({
 
   if (!isLogged) redirect('/auth/signin')
 
-  const dataCurrentBlog = await getDataBlogFromSlug(blogSlug)
+  const blog = await getBlogFromSlug(blogSlug)
 
-  if (!dataCurrentBlog) redirect('/auth/signin')
+  if (!blog) redirect('/auth/signin')
 
   const data = {
     blog: {
-      slug: dataCurrentBlog.slug,
+      slug: blog.slug,
       blogUser: {
-        id: dataCurrentBlog.users[0].id,
-        role: dataCurrentBlog.users[0].role,
+        id: blog.users[0].id,
+        role: blog.users[0].role,
         user: {
-          id: dataCurrentBlog.users[0].user.id,
-          email: dataCurrentBlog.users[0].user.email,
-          name: dataCurrentBlog.users[0].user.name,
+          id: blog.users[0].user.id,
+          email: blog.users[0].user.email,
+          name: blog.users[0].user.name,
         },
       },
     },

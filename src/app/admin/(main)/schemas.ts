@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const CreateBlogSchema = z.object({
+export const UpsertBlogSchema = z.object({
   name: z
     .string()
     .min(1, { message: 'O título é obrigatório' })
@@ -14,4 +14,4 @@ export const CreateBlogSchema = z.object({
   secondColor: z.string(),
 })
 
-export type BlogInput = z.infer<typeof CreateBlogSchema>
+export type BlogInput = z.infer<typeof UpsertBlogSchema>

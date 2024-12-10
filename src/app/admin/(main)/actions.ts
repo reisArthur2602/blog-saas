@@ -10,6 +10,7 @@ const ERROR_MESSAGES = {
 }
 
 type CreateBlogInput = Prisma.BlogUncheckedCreateInput
+
 const fetchBlogsForUser = async (userId: string) => {
   return await db.blog.findMany({
     where: { users: { some: { user_id: userId } } },

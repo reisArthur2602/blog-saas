@@ -3,10 +3,10 @@
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/prisma'
 
-export const getDataBlogFromSlug = async (slug: string) => {
+export const getBlogFromSlug = async (slug: string) => {
   const currentUser = await auth()
 
-  const blog = await db.blog.findUnique({
+  return await db.blog.findUnique({
     where: { slug },
     select: {
       slug: true,
@@ -20,5 +20,4 @@ export const getDataBlogFromSlug = async (slug: string) => {
       },
     },
   })
-  return blog
 }

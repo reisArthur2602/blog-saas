@@ -30,7 +30,8 @@ import { Plus, Zap } from 'lucide-react'
 
 import { createBlog } from '../actions'
 import { sendPromptToGemini } from '@/lib/gemini'
-import { BlogInput, CreateBlogSchema } from '../schemas'
+import { BlogInput, UpsertBlogSchema } from '../schemas'
+import { toast } from 'sonner'
 
 type GeminiResult = {
   name: string
@@ -46,7 +47,7 @@ export const CreateBlog = () => {
   )
 
   const form = useForm<BlogInput>({
-    resolver: zodResolver(CreateBlogSchema),
+    resolver: zodResolver(UpsertBlogSchema),
     defaultValues: {
       slug: '',
       description: '',
@@ -98,7 +99,7 @@ export const CreateBlog = () => {
       console.error(response.error)
       return
     }
-    console.log('Blog cadastrado com sucesso')
+    toast.success('Blog cadastrado com sucesso')
     form.reset()
     setIsOpen(false)
   })
