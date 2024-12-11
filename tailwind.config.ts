@@ -9,10 +9,6 @@ const config: Config = {
 	],
 	theme: {
 		extend: {
-			backgroundImage: {
-				'custom-gradient':
-					'linear-gradient(to top left, #091E3A, #2F80ED, #2D9EE0)',
-			},
 			colors: {
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',

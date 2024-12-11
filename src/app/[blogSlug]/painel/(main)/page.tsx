@@ -8,6 +8,7 @@ import { SummaryCard } from './_sessions/summary-card'
 import { Pen, User2, Users2 } from 'lucide-react'
 import { auth } from '@/lib/auth'
 
+
 type Props = {
   params: { blogSlug: string }
   searchParams: {
@@ -54,6 +55,8 @@ const Page = async ({
         </div>
 
         <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+
+
           <SummaryCard
             title="Usuarios cadastrados"
             count={totalUsers}
@@ -69,6 +72,7 @@ const Page = async ({
             count={totalPostsByMonth}
             icon={<Pen />}
           />
+
         </section>
       </div>
     </div>

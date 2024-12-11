@@ -46,3 +46,9 @@ export const formatCategoryPost = (category: PostCategory): string => {
       return 'Categoria desconhecida'
   }
 }
+
+export const formatPrice = (price: number) =>
+  price.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  })

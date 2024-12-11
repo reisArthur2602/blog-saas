@@ -79,6 +79,24 @@ html {
 }
 
 
+
+.gradient {
+ background: #396afc;
+  background: linear-gradient(
+    to bottom,
+    #396afc,#2948ff
+  );
+}
+
+.bg-gradient {
+  background: #020617;
+  background: linear-gradient(
+    to bottom,
+    #020617,#0f172a
+  );
+}
+
+
 .scrollbar-hidden::-webkit-scrollbar {
   display: none;
 }
@@ -87,3 +105,5 @@ html {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+

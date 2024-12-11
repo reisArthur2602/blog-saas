@@ -14,7 +14,7 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body>
         <ThemeProvider
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >

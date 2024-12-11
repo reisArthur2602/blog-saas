@@ -19,6 +19,7 @@ import { CreateBlog } from './create-blog'
 import { Button } from '@/components/ui/button'
 
 import { SquareArrowOutUpRight } from 'lucide-react'
+import { Suspense } from 'react'
 
 export const AdminBlogs = ({ blogs }: { blogs: Blog[] }) => {
   const hasBlogFromThisUser = blogs.length > 0
@@ -55,6 +56,7 @@ export const AdminBlogs = ({ blogs }: { blogs: Blog[] }) => {
           </ScrollArea>
         </CardFooter>
       )}
+
     </Card>
   )
 }
